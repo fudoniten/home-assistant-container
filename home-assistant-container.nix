@@ -172,7 +172,7 @@ in {
                     "wyoming"
                   ];
                   customLovelaceModules =
-                    with pkgs.home-assistant.customLovelaceModules; [
+                    with pkgs.home-assistant-custom-lovelace-modules; [
                       android-tv-card
                       button-card
                       mini-graph-card
@@ -181,7 +181,7 @@ in {
                       mushroom
                     ];
                   customComponents =
-                    with pkgs.home-assistant.customComponents; [
+                    with pkgs.home-assistantcustom-components; [
                       frigate
                       ntfy
                       prometheus_sensor
