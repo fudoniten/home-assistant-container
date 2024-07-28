@@ -108,13 +108,12 @@ in {
   config = {
     systemd.tmpfiles.settings = {
       "20-home-assistant" = let
-        mkRule = subdir:
-          dir {
-            type = "d";
-            user = "root";
-            group = "root";
-            mode = "0700";
-          };
+        mkRule = subdir: {
+          type = "d";
+          user = "root";
+          group = "root";
+          mode = "0700";
+        };
         subdirs = [ "config" "node-red" "open-wake-word" "whisper" "piper" ];
       in genAttrs (map (subdir: "${cfg.state-directory}/${subdir}") subdirs)
       mkRule;
