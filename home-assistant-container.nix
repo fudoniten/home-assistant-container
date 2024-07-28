@@ -132,9 +132,8 @@ in {
             service = {
               restart = "always";
               networks = [ "internal_network" "external_network" ];
-              volumes = [
-                "${cfg.state-directory}/config:${config.services.home-assistant.configDir}"
-              ];
+              volumes =
+                [ "${cfg.state-directory}/config:/var/lib/home-assistant" ];
               ports = [ "${toString cfg.ports.home-assistant}:8123" ];
               depends_on = [ "node-red" "open-wake-word" "whisper" "piper" ];
             };
@@ -145,6 +144,7 @@ in {
                 system.nssModules = mkForce [ ];
                 services.home-assistant = {
                   enable = true;
+                  configDir = "/var/lib/home-assistant";
                   lovelaceConfigWritable = true;
                   extraComponents = [
                     "default_config"
