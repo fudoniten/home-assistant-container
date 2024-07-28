@@ -105,7 +105,7 @@ in {
     };
   };
 
-  config = {
+  config = mkIf cfg.enable {
     systemd.tmpfiles.settings = {
       "20-home-assistant" = let
         mkRule = subdir: {
