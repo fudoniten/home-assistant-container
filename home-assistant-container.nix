@@ -147,54 +147,53 @@ in {
                   configDir = "/var/lib/home-assistant";
                   lovelaceConfigWritable = true;
                   extraComponents = [
-                    "default_config"
-                    "met"
-                    "esphome"
+                    # "default_config"
+                    # "met"
+                    # "esphome"
 
-                    "accuweather"
-                    "adguard"
-                    "androidtv"
-                    "androidtv_remote"
-                    "api"
-                    "august"
-                    "binary_sensor"
-                    "brother"
-                    "calendar"
-                    "cast"
-                    "coinbase"
-                    "google"
-                    "google_assistant"
-                    "google_generative_ai_conversation"
-                    "ipp"
-                    "kraken"
-                    "media_player"
-                    "media_source"
-                    "mobile_app"
-                    "mqtt"
-                    "minecraft_server"
-                    "nest"
-                    "nmap_tracker"
-                    "openai_conversation"
-                    "pocketcasts"
-                    "prometheus"
-                    "proximity"
-                    "radio_browser"
-                    "samsungtv"
-                    "sun"
-                    "synology_dsm"
-                    "tile"
-                    "upnp"
-                    "wyoming"
+                    # "accuweather"
+                    # "adguard"
+                    # "androidtv"
+                    # "androidtv_remote"
+                    # "api"
+                    # "august"
+                    # "binary_sensor"
+                    # "brother"
+                    # "calendar"
+                    # "cast"
+                    # "coinbase"
+                    # "google"
+                    # "google_assistant"
+                    # "google_generative_ai_conversation"
+                    # "ipp"
+                    # "kraken"
+                    # "media_player"
+                    # "media_source"
+                    # "mobile_app"
+                    # "mqtt"
+                    # "minecraft_server"
+                    # "nest"
+                    # "nmap_tracker"
+                    # "openai_conversation"
+                    # "pocketcasts"
+                    # "prometheus"
+                    # "proximity"
+                    # "radio_browser"
+                    # "samsungtv"
+                    # "sun"
+                    # "synology_dsm"
+                    # "tile"
+                    # "upnp"
+                    # "wyoming"
                   ];
                   customLovelaceModules =
-                    with pkgs.home-assistant-custom-lovelace-modules;
-                    [
-                      # android-tv-card
-                      # button-card
-                      # mini-graph-card
-                      # mini-media-player
-                      # multiple-entity-row
-                      # mushroom
+                    with pkgs.home-assistant-custom-lovelace-modules; [
+                      android-tv-card
+                      button-card
+                      mini-graph-card
+                      mini-media-player
+                      multiple-entity-row
+                      mushroom
                     ];
                   customComponents =
                     with pkgs.home-assistant-custom-components; [
