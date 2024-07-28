@@ -2,12 +2,12 @@
 
 with lib;
 let
-  cfg = config.services.home-assistant-container;
+  cfg = config.services.homeAssistantContainer;
 
   hostname = config.instance.hostname;
 
 in {
-  options.services.home-assistant-container = with types; {
+  options.services.homeAssistantContainer = with types; {
     enable = mkEnableOption "Enable Home Assistant running in a container.";
 
     images = genAttrs [
