@@ -187,19 +187,20 @@ in {
                     "wyoming"
                   ];
                   customLovelaceModules =
-                    with pkgs.home-assistant-custom-lovelace-modules; [
-                      android-tv-card
-                      button-card
-                      mini-graph-card
-                      mini-media-player
-                      multiple-entity-row
-                      mushroom
-                    ];
-                  customComponents = with pkgs.home-assistant-custom-components;
+                    with pkgs.home-assistant-custom-lovelace-modules;
                     [
-                      # frigate
-                      # ntfy
-                      # prometheus_sensor
+                      # android-tv-card
+                      # button-card
+                      # mini-graph-card
+                      # mini-media-player
+                      # multiple-entity-row
+                      # mushroom
+                    ];
+                  customComponents =
+                    with pkgs.home-assistant-custom-components; [
+                      frigate
+                      ntfy
+                      prometheus_sensor
                     ];
                   config = {
                     # components = {
