@@ -195,11 +195,11 @@ in {
                       multiple-entity-row
                       mushroom
                     ];
-                  customComponents =
-                    with pkgs.home-assistant-custom-components; [
-                      frigate
-                      ntfy
-                      prometheus_sensor
+                  customComponents = with pkgs.home-assistant-custom-components;
+                    [
+                      # frigate
+                      # ntfy
+                      # prometheus_sensor
                     ];
                   config = {
                     # components = {
