@@ -6,6 +6,8 @@ let
 
   hostname = config.instance.hostname;
 
+  timezone = config.time.timeZone;
+
 in {
   options.services.homeAssistantContainer = with types; {
     enable = mkEnableOption "Enable Home Assistant running in a container.";
@@ -215,7 +217,7 @@ in {
                     homeassistant = {
                       name = "Seattle";
                       temperature_unit = "C";
-                      time_zone = config.time.timeZone;
+                      time_zone = timezone;
                       unit_system = "metric";
                     } // (optionalAttrs (!isNull cfg.position) {
                       latitude = cfg.position.latitude;
@@ -246,7 +248,7 @@ in {
           #     "/etc/localtime:/etc/localtime:ro"
           #   ];
           #   ports = [ "${toString cfg.ports.home-assistant}:8123" ];
-          #   environment.TZ = config.time.timeZone;
+          #   environment.TZ = timezone;
           #   network_mode = "host";
           # };
 
@@ -256,7 +258,7 @@ in {
             restart = "always";
             volumes = [ "${cfg.state-directory}/node-red:/data" ];
             ports = [ "${toString cfg.ports.node-red}:1880" ];
-            environment.TZ = config.time.timeZone;
+            environment.TZ = timezone;
           };
 
           open-wake-word.service = {
@@ -264,7 +266,7 @@ in {
             networks = [ "internal_network" ];
             restart = "always";
             volumes = [ "${cfg.state-directory}/open-wake-word:/data" ];
-            environment.TZ = config.time.timeZone;
+            environment.TZ = timezone;
             command = "--preload-model '${cfg.wake-word}'";
           };
 
@@ -273,7 +275,7 @@ in {
             networks = [ "internal_network" ];
             restart = "always";
             volumes = [ "${cfg.state-directory}/whisper:/data" ];
-            environment.TZ = config.time.timeZone;
+            environment.TZ = timezone;
             entrypoint = "python3";
             command = concatStringsSep " " [
               "-m wyoming_faster_whisper"
@@ -291,7 +293,7 @@ in {
             networks = [ "internal_network" ];
             restart = "always";
             volumes = [ "${cfg.state-directory}/piper:/data" ];
-            environment.TZ = config.time.timeZone;
+            environment.TZ = timezone;
             command = "--voice ${cfg.piper.voice}";
           };
         };
