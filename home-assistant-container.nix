@@ -87,6 +87,20 @@ in {
       description = "Voice to use when generating audio from text.";
       default = "en-gb-southern_english_female-low";
     };
+
+    position = let
+      posOpts = {
+        options = {
+          latitude = mkOption { type = float; };
+          longitude = mkOption { type = float; };
+        };
+      };
+    in mkOption {
+      type = nullOr (submodule posOpts);
+      description =
+        "Position of the home running this Home Assistant instance.";
+      default = null;
+    };
   };
 
   config = {
@@ -203,9 +217,10 @@ in {
                       temperature_unit = "C";
                       time_zone = config.time.timeZone;
                       unit_system = "metric";
-                      latitude = cfg.latitude; # "47.52694";
-                      longitude = cfg.longitude; # "-122.16804";
-                    };
+                    } // (optionalAttrs (!isNull cfg.position) {
+                      latitude = cfg.position.latitude;
+                      longitude = cfg.position.longitude;
+                    });
                     nest = mkIf (!isNull cfg.nest) {
                       client_id = cfg.nest.client-id;
                       client_secret = cfg.nest.client-secret;
