@@ -164,7 +164,6 @@ in {
                     "coinbase"
                     "google"
                     "google_assistant"
-                    "google_calendar"
                     "google_generative_ai_conversation"
                     "ipp"
                     "kraken"
