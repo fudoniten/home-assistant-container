@@ -181,7 +181,7 @@ in {
                       mushroom
                     ];
                   customComponents =
-                    with pkgs.home-assistantcustom-components; [
+                    with pkgs.home-assistant-custom-components; [
                       frigate
                       ntfy
                       prometheus_sensor
