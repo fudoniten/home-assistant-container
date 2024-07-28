@@ -79,7 +79,7 @@ in {
   };
 
   config = {
-    systemd.tmpfiles = {
+    systemd.tmpfiles.settings = {
       "20-home-assistant" = let
         mkRule = subdir:
           dir {
