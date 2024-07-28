@@ -37,6 +37,17 @@ in {
       };
     };
 
+    nest = mkOption {
+      type = let
+        nestOpts = {
+          client-id = mkOption { type = str; };
+          client-secret = mkOption { type = str; };
+          project-id = mkOption { type = str; };
+        };
+      in nullOr (submodule nestOpts);
+      default = null;
+    };
+
     # mqtt = {
     #   broker = mkOption {
     #     type = str;
@@ -196,9 +207,9 @@ in {
                       longitude = cfg.longitude; # "-122.16804";
                     };
                     nest = mkIf (!isNull cfg.nest) {
-                      client_id = cfg.nest.client_id;
-                      client_secret = cfg.nest.client_secret;
-                      project_id = cfg.nest.project_id;
+                      client_id = cfg.nest.client-id;
+                      client_secret = cfg.nest.client-secret;
+                      project_id = cfg.nest.project-id;
                     };
                     prometheus = {
                       namespace = "hass";
