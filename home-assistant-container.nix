@@ -144,63 +144,63 @@ in {
                 system.nssModules = mkForce [ ];
                 services.home-assistant = {
                   enable = true;
-                  configDir = "/var/lib/home-assistant";
-                  lovelaceConfigWritable = true;
-                  extraComponents = [
-                    "default_config"
-                    "met"
-                    "esphome"
+                  # configDir = "/var/lib/home-assistant";
+                  # lovelaceConfigWritable = true;
+                  # extraComponents = [
+                  #   "default_config"
+                  #   "met"
+                  #   "esphome"
 
-                    "accuweather"
-                    "adguard"
-                    "androidtv"
-                    "androidtv_remote"
-                    "api"
-                    "august"
-                    "binary_sensor"
-                    "brother"
-                    "calendar"
-                    "cast"
-                    "coinbase"
-                    "google"
-                    "google_assistant"
-                    "google_generative_ai_conversation"
-                    "ipp"
-                    "kraken"
-                    "media_player"
-                    "media_source"
-                    "mobile_app"
-                    "mqtt"
-                    "minecraft_server"
-                    "nest"
-                    "nmap_tracker"
-                    "openai_conversation"
-                    "pocketcasts"
-                    "prometheus"
-                    "proximity"
-                    "radio_browser"
-                    "samsungtv"
-                    "sun"
-                    "synology_dsm"
-                    "tile"
-                    "upnp"
-                    "wyoming"
-                  ];
-                  customLovelaceModules =
-                    with pkgs.home-assistant-custom-lovelace-modules; [
-                      android-tv-card
-                      button-card
-                      mini-graph-card
-                      mini-media-player
-                      multiple-entity-row
-                      mushroom
-                    ];
-                  customComponents =
-                    with pkgs.home-assistant-custom-components; [
-                      frigate
-                      ntfy
-                      prometheus_sensor
-                    ];
+                  #   "accuweather"
+                  #   "adguard"
+                  #   "androidtv"
+                  #   "androidtv_remote"
+                  #   "api"
+                  #   "august"
+                  #   "binary_sensor"
+                  #   "brother"
+                  #   "calendar"
+                  #   "cast"
+                  #   "coinbase"
+                  #   "google"
+                  #   "google_assistant"
+                  #   "google_generative_ai_conversation"
+                  #   "ipp"
+                  #   "kraken"
+                  #   "media_player"
+                  #   "media_source"
+                  #   "mobile_app"
+                  #   "mqtt"
+                  #   "minecraft_server"
+                  #   "nest"
+                  #   "nmap_tracker"
+                  #   "openai_conversation"
+                  #   "pocketcasts"
+                  #   "prometheus"
+                  #   "proximity"
+                  #   "radio_browser"
+                  #   "samsungtv"
+                  #   "sun"
+                  #   "synology_dsm"
+                  #   "tile"
+                  #   "upnp"
+                  #   "wyoming"
+                  # ];
+                  # customLovelaceModules =
+                  #   with pkgs.home-assistant-custom-lovelace-modules; [
+                  #     android-tv-card
+                  #     button-card
+                  #     mini-graph-card
+                  #     mini-media-player
+                  #     multiple-entity-row
+                  #     mushroom
+                  #   ];
+                  # customComponents =
+                  #   with pkgs.home-assistant-custom-components; [
+                  #     frigate
+                  #     ntfy
+                  #     prometheus_sensor
+                  #   ];
                   config = {
                     # components = {
                     #   mqtt = {
@@ -222,15 +222,15 @@ in {
                       latitude = cfg.position.latitude;
                       longitude = cfg.position.longitude;
                     });
-                    nest = mkIf (!isNull cfg.nest) {
-                      client_id = cfg.nest.client-id;
-                      client_secret = cfg.nest.client-secret;
-                      project_id = cfg.nest.project-id;
-                    };
-                    prometheus = {
-                      namespace = "hass";
-                      requires_auth = false;
-                    };
+                    # nest = mkIf (!isNull cfg.nest) {
+                    #   client_id = cfg.nest.client-id;
+                    #   client_secret = cfg.nest.client-secret;
+                    #   project_id = cfg.nest.project-id;
+                    # };
+                    # prometheus = {
+                    #   namespace = "hass";
+                    #   requires_auth = false;
+                    # };
                   };
                 };
               };
