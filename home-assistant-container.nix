@@ -121,7 +121,7 @@ in {
     };
 
     virtualisation.arion.projects.home-assistant.settings = let
-      image = { config, pkgs, ... }: {
+      image = { config, ... }: {
         project.name = "home-assistant";
         networks = {
           external_network.internal = false;
