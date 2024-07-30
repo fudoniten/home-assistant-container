@@ -144,6 +144,7 @@ in {
                 system.nssModules = mkForce [ ];
                 services.home-assistant = {
                   enable = true;
+                  package = pkgs.pkgsUnstable.home-assistant;
                   configDir = "/var/lib/home-assistant";
                   lovelaceConfigWritable = true;
                   extraComponents = [
