@@ -263,7 +263,7 @@ in {
 
           open-wake-word.service = {
             image = cfg.images.open-wake-word;
-            networks = [ "internal_network" ];
+            networks = [ "internal_network" "external_network" ];
             restart = "always";
             volumes = [ "${cfg.state-directory}/open-wake-word:/data" ];
             environment.TZ = timezone;
@@ -272,7 +272,7 @@ in {
 
           whisper.service = {
             image = cfg.images.whisper;
-            networks = [ "internal_network" ];
+            networks = [ "internal_network" "external_network" ];
             restart = "always";
             volumes = [ "${cfg.state-directory}/whisper:/data" ];
             environment.TZ = timezone;
@@ -290,7 +290,7 @@ in {
 
           piper.service = {
             image = cfg.images.piper;
-            networks = [ "internal_network" ];
+            networks = [ "internal_network" "external_network" ];
             restart = "always";
             volumes = [ "${cfg.state-directory}/piper:/data" ];
             environment.TZ = timezone;
