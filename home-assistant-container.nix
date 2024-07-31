@@ -123,20 +123,16 @@ in {
     virtualisation.arion.projects.home-assistant.settings = let
       image = { config, ... }: {
         project.name = "home-assistant";
-        networks = {
-          external_network.internal = false;
-          internal_network.internal = true;
-        };
         docker-compose.volumes = { node-red-data = { }; };
         services = {
           home-assistant = {
             service = {
               restart = "always";
-              networks = [ "internal_network" "external_network" ];
               volumes =
                 [ "${cfg.state-directory}/config:/var/lib/home-assistant" ];
               ports = [ "${toString cfg.ports.home-assistant}:8123" ];
               depends_on = [ "node-red" "open-wake-word" "whisper" "piper" ];
+              network_mode = "host";
             };
             nixos = {
               useSystemd = true;
@@ -257,7 +253,6 @@ in {
 
           node-red.service = {
             image = cfg.images.node-red;
-            networks = [ "internal_network" "external_network" ];
             restart = "always";
             volumes = [ "node-red-data:/data" ];
             ports = [ "${toString cfg.ports.node-red}:1880" ];
@@ -266,7 +261,6 @@ in {
 
           open-wake-word.service = {
             image = cfg.images.open-wake-word;
-            networks = [ "internal_network" "external_network" ];
             restart = "always";
             volumes = [ "${cfg.state-directory}/open-wake-word:/data" ];
             environment.TZ = timezone;
@@ -275,7 +269,6 @@ in {
 
           whisper.service = {
             image = cfg.images.whisper;
-            networks = [ "internal_network" "external_network" ];
             restart = "always";
             volumes = [ "${cfg.state-directory}/whisper:/data" ];
             environment.TZ = timezone;
@@ -293,7 +286,6 @@ in {
 
           piper.service = {
             image = cfg.images.piper;
-            networks = [ "internal_network" "external_network" ];
             restart = "always";
             volumes = [ "${cfg.state-directory}/piper:/data" ];
             environment.TZ = timezone;
