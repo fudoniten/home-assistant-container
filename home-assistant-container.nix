@@ -127,6 +127,7 @@ in {
           external_network.internal = false;
           internal_network.internal = true;
         };
+        docker-compose.volumes = { node-red-data = { }; };
         services = {
           home-assistant = {
             service = {
@@ -256,7 +257,7 @@ in {
             image = cfg.images.node-red;
             networks = [ "internal_network" "external_network" ];
             restart = "always";
-            volumes = [ "${cfg.state-directory}/node-red:/data" ];
+            volumes = [ "node-red-data:/data" ];
             ports = [ "${toString cfg.ports.node-red}:1880" ];
             environment.TZ = timezone;
           };
