@@ -188,6 +188,7 @@ in {
                     "upnp"
                     "wyoming"
                   ];
+                  extraPackages = pyPkgs: with pyPkgs; [ gtts ];
                   customLovelaceModules =
                     with pkgs.home-assistant-custom-lovelace-modules; [
                       android-tv-card
