@@ -1,10 +1,10 @@
 { extended-openai-conversation, lib, buildHomeAssistantComponent
-, python3Packages, version, ... }:
+, python312Packages, version, ... }:
 
 buildHomeAssistantComponent {
   src = extended-openai-conversation;
   owner = "jekalmin";
   domain = "extended_openai_conversation";
   version = version;
-  propagatedBuildInputs = with python3Packages; [ openai ];
+  propagatedBuildInputs = with python312Packages; [ openai ];
 }
