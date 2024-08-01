@@ -7,7 +7,7 @@ buildPythonPackage rec {
   src = extended-openai-conversation;
 
   propagatedBuildInputs = with pythonPackages; [
-    bs4
+    beautifulsoup4
     homeassistant
     openai
     voluptuous
