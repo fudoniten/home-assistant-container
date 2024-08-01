@@ -28,9 +28,8 @@
           homeAssistantComponents = final: prev:
             let localPackages = self.packages."${prev.system}";
             in {
-              home-assistant-custom-components = {
-                inherit (localPackages) extended_openai_conversation;
-              };
+              home-assistant-custom-components.extended_openai_conversation =
+                localPackages.extended_openai_conversation;
             };
         };
 
