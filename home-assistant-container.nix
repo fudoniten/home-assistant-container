@@ -257,8 +257,8 @@ in {
             image = cfg.images.node-red;
             restart = "always";
             volumes = [ "node-red-data:/data" ];
-            ports = [ "${toString cfg.ports.node-red}:1880" ];
             environment.TZ = timezone;
+            ports = [ "${toString cfg.ports.node-red}:1880" ];
           };
 
           open-wake-word.service = {
@@ -267,6 +267,7 @@ in {
             volumes = [ "${cfg.state-directory}/open-wake-word:/data" ];
             environment.TZ = timezone;
             command = "--preload-model '${cfg.wake-word}'";
+            ports = [ "10400:10400/tcp" "10400:10400/udp" ];
           };
 
           whisper.service = {
@@ -284,6 +285,7 @@ in {
               "--data-dir /data"
               "--download-dir /data"
             ];
+            ports = [ "10300:10300" ];
           };
 
           piper.service = {
@@ -292,6 +294,7 @@ in {
             volumes = [ "${cfg.state-directory}/piper:/data" ];
             environment.TZ = timezone;
             command = "--voice ${cfg.piper.voice}";
+            ports = [ "10200:10200" ];
           };
         };
       };
