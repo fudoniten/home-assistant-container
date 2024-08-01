@@ -1,20 +1,14 @@
-{ extended-openai-conversation, lib, python3Packages, ... }:
+{ extended-openai-conversation, lib, buildHomeAssistantComponent
+, python3Packages, version, ... }:
 
-with python3Packages;
-buildPythonPackage rec {
-  name = "extended-openai-conversation";
-
+buildHomeAssistantComponent {
   src = extended-openai-conversation;
-
-  propagatedBuildInputs = with pythonPackages; [
+  owner = "jekalmin";
+  domain = "extended_openai_conversation";
+  version = version;
+  propagatedBuildInputs = with python3Packages; [
     beautifulsoup4
-    # openai
+    openai
     voluptuous
   ];
-
-  meta = with lib; {
-    description =
-      "Enhanced OpenAI conversational abilities for home assistant.";
-    homepage = "https://github.com/jekalmin/extended_openai_conversation";
-  };
 }

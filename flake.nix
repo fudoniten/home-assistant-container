@@ -6,7 +6,7 @@
     utils.url = "github:numtide/flake-utils";
     arion.url = "github:hercules-ci/arion";
     extended-openai-conversation = {
-      url = "github:jekalmin/extended_openai_conversation";
+      url = "github:jekalmin/extended_openai_conversation?ref=1.0.3";
       flake = false;
     };
   };
@@ -20,6 +20,7 @@
           extended_openai_conversation =
             pkgs.callPackage ./extended-openai-conversation.nix {
               inherit extended-openai-conversation;
+              version = "1.0.3";
             };
         };
       }) // {
