@@ -196,6 +196,7 @@ in {
                     ];
                   customComponents =
                     with pkgs.home-assistant-custom-components; [
+                      extended_openai_conversation
                       frigate
                       ntfy
                       prometheus_sensor
