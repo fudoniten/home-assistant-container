@@ -1,5 +1,6 @@
-{ extended-openai-conversation, lib, buildPythonPackage, pythonPackages, ... }:
+{ extended-openai-conversation, lib, pythonPackages, ... }:
 
+with pythonPackages;
 buildPythonPackage rec {
   name = "extended-openai-conversation";
 
