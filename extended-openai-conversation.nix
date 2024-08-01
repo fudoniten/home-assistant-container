@@ -6,9 +6,4 @@ buildHomeAssistantComponent {
   owner = "jekalmin";
   domain = "extended_openai_conversation";
   version = version;
-  propagatedBuildInputs = with python3Packages; [
-    beautifulsoup4
-    openai
-    voluptuous
-  ];
 }
