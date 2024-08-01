@@ -16,7 +16,7 @@
     utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages."${system}";
       in {
-        package = rec {
+        packages = rec {
           extended_openai_conversation =
             pkgs.callPackage ./extended-openai-conversation.nix {
               inherit extended-openai-conversation;
