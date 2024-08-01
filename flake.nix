@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-24.05";
-    nixpkgsUnstable = "nixpkgs/unstable";
+    nixpkgsUnstable.url = "nixpkgs/unstable";
     utils.url = "github:numtide/flake-utils";
     arion.url = "github:hercules-ci/arion";
     extended-openai-conversation = {
