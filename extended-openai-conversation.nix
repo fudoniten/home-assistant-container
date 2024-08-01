@@ -8,7 +8,6 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = with pythonPackages; [
     beautifulsoup4
-    homeassistant
     openai
     voluptuous
   ];
