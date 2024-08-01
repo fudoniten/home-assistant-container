@@ -6,4 +6,5 @@ buildHomeAssistantComponent {
   owner = "jekalmin";
   domain = "extended_openai_conversation";
   version = version;
+  propagatedBuildInputs = with python3Packages; [ openai ];
 }
