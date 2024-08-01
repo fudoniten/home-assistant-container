@@ -14,7 +14,7 @@
   outputs =
     { self, nixpkgs, utils, arion, extended-openai-conversation, ... }@inputs:
     utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages."${system}";
+      let pkgs = import nixpkgs { inherit system; };
       in {
         packages = rec {
           extended_openai_conversation =
