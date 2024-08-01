@@ -208,6 +208,7 @@ in {
                     #   };
                     # };
                     mobile_app = { };
+                    cloud = { };
                     http = {
                       server_host = [ "0.0.0.0" ];
                       server_port = 8123;
