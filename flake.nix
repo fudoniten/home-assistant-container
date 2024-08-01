@@ -28,7 +28,7 @@
           homeAssistantComponents = final: prev:
             let localPackages = self.packages."${prev.system}";
             in {
-              home-assistant-custom-components.extended_openai_conversation =
+              home-assistant-local-components.extended_openai_conversation =
                 localPackages.extended_openai_conversation;
             };
         };

@@ -195,12 +195,12 @@ in {
                       mushroom
                     ];
                   customComponents =
-                    with pkgs.home-assistant-custom-components; [
-                      extended_openai_conversation
+                    (with pkgs.home-assistant-custom-components; [
                       frigate
                       ntfy
                       prometheus_sensor
-                    ];
+                    ]) ++ (with pkgs.home-assistant-local-components;
+                      [ extended_openai_conversation ]);
                   config = {
                     # components = {
                     #   mqtt = {
