@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-24.05";
-    nixpkgsUnstable.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
     arion.url = "github:hercules-ci/arion";
     extended-openai-conversation = {
@@ -22,7 +21,7 @@
         packages = rec {
           extended_openai_conversation =
             pkgs.callPackage ./extended-openai-conversation.nix {
-              inherit extended-openai-conversation pkgsUnstable;
+              inherit extended-openai-conversation;
               version = "1.0.3";
             };
         };
