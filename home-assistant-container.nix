@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgsUnstable, ... }:
 
 with lib;
 let
@@ -184,7 +184,11 @@ in {
                     "upnp"
                     "wyoming"
                   ];
-                  extraPackages = pyPkgs: with pyPkgs; [ gtts ];
+                  extraPackages = pyPkgs:
+                    with pyPkgs; [
+                      gtts
+                      pkgsUnstable.python32Packages.openai
+                    ];
                   customLovelaceModules =
                     with pkgs.home-assistant-custom-lovelace-modules; [
                       android-tv-card
