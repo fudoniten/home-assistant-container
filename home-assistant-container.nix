@@ -187,7 +187,7 @@ in {
                   extraPackages = pyPkgs:
                     with pyPkgs; [
                       gtts
-                      pkgs.pkgsUnstable.python32Packages.openai
+                      pkgs.pkgsUnstable.python312Packages.openai
                     ];
                   customLovelaceModules =
                     with pkgs.home-assistant-custom-lovelace-modules; [
