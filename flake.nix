@@ -11,8 +11,8 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgsUnstable, utils, arion
-    , extended-openai-conversation, ... }@inputs:
+  outputs =
+    { self, nixpkgs, utils, arion, extended-openai-conversation, ... }@inputs:
     utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages."${system}";
