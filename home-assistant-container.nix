@@ -1,4 +1,4 @@
-{ config, lib, pkgs, pkgsUnstable, ... }:
+{ config, lib, pkgs, ... }:
 
 with lib;
 let
@@ -187,7 +187,7 @@ in {
                   extraPackages = pyPkgs:
                     with pyPkgs; [
                       gtts
-                      pkgsUnstable.python32Packages.openai
+                      pkgs.pkgsUnstable.python32Packages.openai
                     ];
                   customLovelaceModules =
                     with pkgs.home-assistant-custom-lovelace-modules; [

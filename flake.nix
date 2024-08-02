@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-24.05";
-    nixpkgsUnstable.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
     arion.url = "github:hercules-ci/arion";
     extended-openai-conversation = {
@@ -12,19 +11,16 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgsUnstable, utils, arion
-    , extended-openai-conversation, ... }@inputs:
+  outputs =
+    { self, nixpkgs, utils, arion, extended-openai-conversation, ... }@inputs:
     utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages."${system}";
-        pkgsUnstable = nixpkgsUnstable.legacyPackages."${system}";
+      let pkgs = nixpkgs.legacyPackages."${system}";
       in {
         packages = rec {
           extended_openai_conversation =
             pkgs.callPackage ./extended-openai-conversation.nix {
               inherit extended-openai-conversation;
               version = "1.0.3";
-              openai = pkgsUnstable.python312Packages.openai;
             };
         };
       }) // {
