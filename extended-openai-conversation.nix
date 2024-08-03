@@ -12,7 +12,7 @@ buildHomeAssistantComponent {
       src = fetchFromGitHub {
         owner = "openai";
         repo = "openai-python";
-        rev = "ref/tags/v${version}";
+        rev = "refs/tags/v${version}";
         hash = "sha256-yU0XWEDYl/oBPpYNFg256H0Hn5AaJiP0vOQhbRLnAxQ=";
       };
     });
