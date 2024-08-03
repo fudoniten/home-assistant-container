@@ -10,7 +10,7 @@
       flake = false;
     };
     hass-node-red = {
-      url = "github:jachowj/hass-node-red?ref=v4.0.1";
+      url = "github:zachowj/hass-node-red?ref=v4.0.1";
       flake = false;
     };
   };
