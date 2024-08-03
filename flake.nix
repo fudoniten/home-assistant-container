@@ -9,10 +9,14 @@
       url = "github:jekalmin/extended_openai_conversation?ref=1.0.3";
       flake = false;
     };
+    hass-node-red = {
+      url = "github:jachowj/hass-node-red?ref=v4.0.1";
+      flake = false;
+    };
   };
 
-  outputs =
-    { self, nixpkgs, utils, arion, extended-openai-conversation, ... }@inputs:
+  outputs = { self, nixpkgs, utils, arion, extended-openai-conversation
+    , hass-node-red, ... }@inputs:
     utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages."${system}";
       in {
@@ -22,6 +26,10 @@
               inherit extended-openai-conversation;
               version = "1.0.3";
             };
+          hass-node-red = pkgs.callPackage ./hass-node-red.nix {
+            inherit hass-node-red;
+            version = "4.0.1";
+          };
         };
       }) // {
         overlays = rec {
@@ -31,6 +39,7 @@
             in {
               home-assistant-local-components.extended_openai_conversation =
                 localPackages.extended_openai_conversation;
+              hass-node-red = localPackages.hass-node-red;
             };
         };
 

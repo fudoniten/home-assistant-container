@@ -202,8 +202,10 @@ in {
                       frigate
                       ntfy
                       prometheus_sensor
-                    ]) ++ (with pkgs.home-assistant-local-components;
-                      [ extended_openai_conversation ]);
+                    ]) ++ (with pkgs.home-assistant-local-components; [
+                      extended_openai_conversation
+                      hass-node-red
+                    ]);
                   config = {
                     # components = {
                     #   mqtt = {
@@ -216,6 +218,7 @@ in {
                     history = { };
                     energy = { };
                     recorder = { };
+                    node_red = { };
                     http = {
                       server_host = [ "0.0.0.0" ];
                       server_port = 8123;
