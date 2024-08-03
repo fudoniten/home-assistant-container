@@ -37,9 +37,10 @@
           homeAssistantComponents = final: prev:
             let localPackages = self.packages."${prev.system}";
             in {
-              home-assistant-local-components.extended_openai_conversation =
-                localPackages.extended_openai_conversation;
-              hass-node-red = localPackages.hass-node-red;
+              home-assistant-local-components = {
+                inherit (localPackages)
+                  extended_openai_conversation hass-node-red;
+              };
             };
         };
 
