@@ -26,7 +26,7 @@
               inherit extended-openai-conversation;
               version = "1.0.3";
             };
-          hass_node_red = pkgs.callPackage ./hass-node-red.nix {
+          nodered = pkgs.callPackage ./hass-node-red.nix {
             inherit hass-node-red;
             version = "4.0.1";
           };
@@ -38,8 +38,7 @@
             let localPackages = self.packages."${prev.system}";
             in {
               home-assistant-local-components = {
-                inherit (localPackages)
-                  extended_openai_conversation hass_node_red;
+                inherit (localPackages) extended_openai_conversation nodered;
               };
             };
         };

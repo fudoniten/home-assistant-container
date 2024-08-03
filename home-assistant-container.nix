@@ -204,7 +204,7 @@ in {
                       prometheus_sensor
                     ]) ++ (with pkgs.home-assistant-local-components; [
                       extended_openai_conversation
-                      hass_node_red
+                      nodered
                     ]);
                   config = {
                     # components = {

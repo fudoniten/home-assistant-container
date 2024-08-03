@@ -4,6 +4,6 @@
 buildHomeAssistantComponent {
   src = hass-node-red;
   owner = "zachowj";
-  domain = "hass-node-red";
+  domain = "nodered";
   version = version;
 }
