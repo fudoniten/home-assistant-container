@@ -1,4 +1,4 @@
-{ extended-openai-conversation, lib, fetchFromGithub
+{ extended-openai-conversation, lib, fetchFromGitHub
 , buildHomeAssistantComponent, python312Packages, version, ... }:
 
 buildHomeAssistantComponent {
@@ -9,7 +9,7 @@ buildHomeAssistantComponent {
   propagatedBuildInputs = let
     openai = python312Packages.openai.overrideAttrs (oldAttrs: rec {
       version = "1.3.8";
-      src = fetchFromGithub {
+      src = fetchFromGitHub {
         owner = "openai";
         repo = "openai-python";
         rev = "ref/tags/v${version}";
