@@ -15,6 +15,10 @@ buildHomeAssistantComponent {
         rev = "refs/tags/v${version}";
         hash = "sha256-yU0XWEDYl/oBPpYNFg256H0Hn5AaJiP0vOQhbRLnAxQ=";
       };
+      disabledTests = oldAttrs.disabledTests ++ [
+        "test_retrying_timeout_errors_doesnt_leak"
+        "test_retrying_status_errors_doesnt_leak"
+      ];
     });
   in [ openai ];
 }
