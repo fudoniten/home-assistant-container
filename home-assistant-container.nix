@@ -179,6 +179,7 @@ in {
                     "prometheus"
                     "proximity"
                     "radio_browser"
+                    "recorder"
                     "samsungtv"
                     "sun"
                     "synology_dsm"
