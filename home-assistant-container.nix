@@ -50,6 +50,12 @@ in {
       default = null;
     };
 
+    extraConfig = mkOption {
+      type = submodule { freeformType = format.type; };
+      description = "Extra configuration options in YAML-compatible format.";
+      default = { };
+    };
+
     # mqtt = {
     #   broker = mkOption {
     #     type = str;
@@ -136,6 +142,9 @@ in {
             };
             nixos = {
               useSystemd = true;
+              imports = [
+                ({ ... }: { services.home-assistant.config = cfg.extraConfig; })
+              ];
               configuration = {
                 boot.tmp.useTmpfs = true;
                 system.nssModules = mkForce [ ];
