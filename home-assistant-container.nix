@@ -50,7 +50,7 @@ in {
       default = null;
     };
 
-    extraConfig = let formats = pkgs.formats.yaml { };
+    extraConfig = let format = pkgs.formats.yaml { };
     in mkOption {
       type = format.type;
       description = "Extra configuration options in YAML-compatible format.";
