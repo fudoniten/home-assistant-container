@@ -9,8 +9,7 @@ let
   timezone = config.time.timeZone;
 
 in {
-  options.services.homeAssistantContainer = let formats = pkgs.formats.yaml { };
-  in with types; {
+  options.services.homeAssistantContainer = with types; {
     enable = mkEnableOption "Enable Home Assistant running in a container.";
 
     images = genAttrs [
@@ -51,7 +50,8 @@ in {
       default = null;
     };
 
-    extraConfig = mkOption {
+    extraConfig = let formats = pkgs.formats.yaml { };
+    in mkOption {
       type = format.type;
       description = "Extra configuration options in YAML-compatible format.";
       default = { };
