@@ -51,7 +51,7 @@ in {
     };
 
     extraConfig = mkOption {
-      type = any;
+      type = format.type;
       description = "Extra configuration options in YAML-compatible format.";
       default = { };
     };
