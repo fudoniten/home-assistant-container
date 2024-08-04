@@ -142,10 +142,12 @@ in {
             };
             nixos = {
               useSystemd = true;
-              imports = [
-                ({ ... }: { services.home-assistant.config = cfg.extraConfig; })
-              ];
               configuration = {
+                imports = [
+                  ({ ... }: {
+                    services.home-assistant.config = cfg.extraConfig;
+                  })
+                ];
                 boot.tmp.useTmpfs = true;
                 system.nssModules = mkForce [ ];
                 services.home-assistant = {
