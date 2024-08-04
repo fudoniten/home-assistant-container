@@ -51,7 +51,7 @@ in {
     };
 
     extraConfig = mkOption {
-      type = submodule { freeformType = format.type; };
+      type = any;
       description = "Extra configuration options in YAML-compatible format.";
       default = { };
     };
