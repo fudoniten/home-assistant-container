@@ -214,7 +214,7 @@ in {
                     energy = { };
                     recorder = { };
                     node_red = { };
-                    discovery = { enable = [ "homekit" "ssdp" "igd" ]; };
+                    discovery.enable = [ "homekit" "ssdp" "igd" ];
                     default_config = { };
                     http = {
                       server_host = [ "0.0.0.0" ];
