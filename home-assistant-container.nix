@@ -57,11 +57,11 @@ in {
       default = { };
     };
 
-    network-interfaces = mkOption {
-      type = nullOr (listOf str);
-      description = "List of network interfaces to scan for devices.";
-      default = null;
-    };
+    # network-interfaces = mkOption {
+    #   type = nullOr (listOf str);
+    #   description = "List of network interfaces to scan for devices.";
+    #   default = null;
+    # };
 
     state-directory = mkOption {
       type = str;
