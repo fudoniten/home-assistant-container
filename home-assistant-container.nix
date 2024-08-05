@@ -57,22 +57,11 @@ in {
       default = { };
     };
 
-    # mqtt = {
-    #   broker = mkOption {
-    #     type = str;
-    #     description = "URL to the local MQTT broker.";
-    #   };
-
-    #   username = mkOption {
-    #     type = str;
-    #     description = "Home Assistant MQTT username.";
-    #   };
-
-    #   password = mkOption {
-    #     type = str;
-    #     description = "Home Assistant MQTT password.";
-    #   };
-    # };
+    network-interfaces = mkOption {
+      type = nullOr (listOf str);
+      description = "List of network interfaces to scan for devices.";
+      default = null;
+    };
 
     state-directory = mkOption {
       type = str;
@@ -219,18 +208,14 @@ in {
                       nodered
                     ]);
                   config = {
-                    # components = {
-                    #   mqtt = {
-                    #     inherit (cfg.mqtt) broker password username;
-                    #     discovery = true;
-                    #   };
-                    # };
                     mobile_app = { };
                     cloud = { };
                     history = { };
                     energy = { };
                     recorder = { };
                     node_red = { };
+                    discovery = { enable = [ "homekit" "ssdp" "igd" ]; };
+                    default_config = { };
                     http = {
                       server_host = [ "0.0.0.0" ];
                       server_port = 8123;
@@ -261,19 +246,6 @@ in {
 
             };
           };
-
-          # home-assistant.service = {
-          #   image = cfg.images.home-assistant;
-          #   networks = [ "internal_network" "external_network" ];
-          #   restart = "always";
-          #   volumes = [
-          #     "${cfg.state-directory}/config:config"
-          #     "/etc/localtime:/etc/localtime:ro"
-          #   ];
-          #   ports = [ "${toString cfg.ports.home-assistant}:8123" ];
-          #   environment.TZ = timezone;
-          #   network_mode = "host";
-          # };
 
           node-red.service = {
             image = cfg.images.node-red;
