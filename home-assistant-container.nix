@@ -161,7 +161,6 @@ in {
                     "calendar"
                     "cast"
                     "coinbase"
-                    "discovery"
                     "energy"
                     "google"
                     "google_assistant"
@@ -216,7 +215,6 @@ in {
                     energy = { };
                     recorder = { };
                     nodered = { };
-                    discovery.enable = [ "homekit" "ssdp" "igd" ];
                     default_config = { };
                     http = {
                       server_host = [ "0.0.0.0" ];
