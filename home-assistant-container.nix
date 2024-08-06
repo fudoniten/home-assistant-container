@@ -161,6 +161,7 @@ in {
                     "calendar"
                     "cast"
                     "coinbase"
+                    "discovery"
                     "energy"
                     "google"
                     "google_assistant"
@@ -168,6 +169,7 @@ in {
                     "history"
                     "ipp"
                     "kraken"
+                    "map"
                     "media_player"
                     "media_source"
                     "mobile_app"
@@ -213,7 +215,7 @@ in {
                     history = { };
                     energy = { };
                     recorder = { };
-                    node_red = { };
+                    nodered = { };
                     discovery.enable = [ "homekit" "ssdp" "igd" ];
                     default_config = { };
                     http = {
