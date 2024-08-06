@@ -214,7 +214,6 @@ in {
                     history = { };
                     energy = { };
                     recorder = { };
-                    nodered = { };
                     default_config = { };
                     http = {
                       server_host = [ "0.0.0.0" ];
