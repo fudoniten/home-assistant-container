@@ -117,7 +117,7 @@ in {
     };
 
     virtualisation.arion.projects.home-assistant.settings = let
-      image = { ... }: {
+      image = { config, ... }: {
         project.name = "home-assistant";
         docker-compose.volumes = { node-red-data = { }; };
         services = {
@@ -142,18 +142,16 @@ in {
                 system.nssModules = mkForce [ ];
                 systemd.tmpfiles.settings = {
                   "10-home-assistant" = {
-                    "${config.services.home-assistant.configDir}/automations.yaml".f =
-                      {
-                        user = "hass";
-                        group = "hass";
-                        mode = "0755";
-                      };
-                    "${config.services.home-assistant.configDir}/scenes.yaml".f =
-                      {
-                        user = "hass";
-                        group = "hass";
-                        mode = "0755";
-                      };
+                    "/var/lib/home-assistant/automations.yaml".f = {
+                      user = "hass";
+                      group = "hass";
+                      mode = "0755";
+                    };
+                    "/var/lib/home-assistant/scenes.yaml".f = {
+                      user = "hass";
+                      group = "hass";
+                      mode = "0755";
+                    };
                   };
                 };
                 services.home-assistant = {
