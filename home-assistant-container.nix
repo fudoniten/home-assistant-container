@@ -140,6 +140,22 @@ in {
                 ];
                 boot.tmp.useTmpfs = true;
                 system.nssModules = mkForce [ ];
+                systemd.tmpfiles.settings = {
+                  "10-home-assistant" = {
+                    "${config.services.home-assistant.configDir}/automations.yaml".f =
+                      {
+                        user = "hass";
+                        group = "hass";
+                        mode = "0755";
+                      };
+                    "${config.services.home-assistant.configDir}/scenes.yaml".f =
+                      {
+                        user = "hass";
+                        group = "hass";
+                        mode = "0755";
+                      };
+                  };
+                };
                 services.home-assistant = {
                   enable = true;
                   package = pkgs.pkgsUnstable.home-assistant;
@@ -210,6 +226,10 @@ in {
                       nodered
                     ]);
                   config = {
+                    "automation ui" = "!include automations.yaml";
+                    "automation manual" = [ ];
+                    "scene ui" = "!include scenes.yaml";
+                    "scene manual" = [ ];
                     mobile_app = { };
                     cloud = { };
                     history = { };
