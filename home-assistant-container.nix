@@ -117,7 +117,7 @@ in {
     };
 
     virtualisation.arion.projects.home-assistant.settings = let
-      image = { config, ... }: {
+      image = { ... }: {
         project.name = "home-assistant";
         docker-compose.volumes = { node-red-data = { }; };
         services = {
