@@ -182,7 +182,7 @@ in {
                     "history"
                     "ipp"
                     "kraken"
-                    "map"
+                    # "map" # Not available
                     "media_player"
                     "media_source"
                     "mobile_app"
