@@ -192,6 +192,7 @@ in {
                     "nmap_tracker"
                     "ollama"
                     "openai_conversation"
+                    "otbr"
                     "pocketcasts"
                     "prometheus"
                     "proximity"
