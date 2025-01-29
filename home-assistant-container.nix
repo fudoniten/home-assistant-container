@@ -190,6 +190,7 @@ in {
                     "minecraft_server"
                     "nest"
                     "nmap_tracker"
+                    "ollama"
                     "openai_conversation"
                     "pocketcasts"
                     "prometheus"
