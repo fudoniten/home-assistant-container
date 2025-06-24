@@ -8,12 +8,12 @@ buildHomeAssistantComponent {
   version = version;
   propagatedBuildInputs = let
     openai = python312Packages.openai.overrideAttrs (oldAttrs: rec {
-      version = "1.3.8";
+      version = "1.13.3";
       src = fetchFromGitHub {
         owner = "openai";
         repo = "openai-python";
         rev = "refs/tags/v${version}";
-        hash = "sha256-yU0XWEDYl/oBPpYNFg256H0Hn5AaJiP0vOQhbRLnAxQ=";
+        hash = "sha256-8SHXUrPLZ7lgvB0jqZlcvKq5Zv2d2UqXjJpgiBpR8P8=";
       };
       disabledTests = oldAttrs.disabledTests ++ [
         "test_retrying_timeout_errors_doesnt_leak"
