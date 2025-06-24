@@ -209,12 +209,14 @@ in {
                   extraPackages = pyPkgs: with pyPkgs; [ gtts pyatv ];
                   customLovelaceModules =
                     with pkgs.home-assistant-custom-lovelace-modules; [
-                      android-tv-card
+                      bubble-card
                       button-card
+                      card-mod
                       mini-graph-card
                       mini-media-player
                       multiple-entity-row
                       mushroom
+                      weather-card
                     ];
                   customComponents =
                     (with pkgs.home-assistant-custom-components; [
