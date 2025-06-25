@@ -1,5 +1,5 @@
 { extended-openai-conversation, lib, fetchFromGitHub
-, buildHomeAssistantComponent, python3Packages, version, ... }:
+, buildHomeAssistantComponent, python312Packages, version, ... }:
 
 buildHomeAssistantComponent {
   src = extended-openai-conversation;
@@ -7,7 +7,7 @@ buildHomeAssistantComponent {
   domain = "extended_openai_conversation";
   version = version;
   propagatedBuildInputs = let
-    openai = python3Packages.openai.overrideAttrs (oldAttrs: rec {
+    openai = python312Packages.openai.overrideAttrs (oldAttrs: rec {
       version = "1.13.3";
       src = fetchFromGitHub {
         owner = "openai";
