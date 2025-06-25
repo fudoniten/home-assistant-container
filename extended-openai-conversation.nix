@@ -1,5 +1,5 @@
 { extended-openai-conversation, lib, fetchFromGitHub
-, buildHomeAssistantComponent, python3Packages, version, ... }:
+, buildHomeAssistantComponent, python3, python3Packages, version, ... }:
 
 buildHomeAssistantComponent {
   src = extended-openai-conversation;
@@ -7,7 +7,9 @@ buildHomeAssistantComponent {
   domain = "extended_openai_conversation";
   version = version;
   propagatedBuildInputs = let
-    openai = python3Packages.openai.overrideAttrs (oldAttrs: rec {
+    openai = (python3Packages.override {
+      inherit (buildHomeAssistantComponent) python;
+    }).openai.overrideAttrs (oldAttrs: rec {
       version = "1.13.3";
       src = fetchFromGitHub {
         owner = "openai";
@@ -20,5 +22,5 @@ buildHomeAssistantComponent {
         "test_retrying_status_errors_doesnt_leak"
       ];
     });
-  in [ openai python3Packages ];
+  in [ openai ];
 }
