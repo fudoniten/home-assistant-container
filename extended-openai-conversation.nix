@@ -30,6 +30,16 @@ let
 
     nativeBuildInputs = with python313Packages; [ hatchling ];
 
+    propagatedBuildInputs = with py; [
+      anyio
+      distro
+      httpx
+      pydantic
+      sniffio
+      tqdm
+      typing-extensions
+    ];
+
     # Optional: skip tests if they fail
     # doCheck = false;
 
