@@ -30,7 +30,7 @@ let
 
     nativeBuildInputs = with python313Packages; [ hatchling ];
 
-    propagatedBuildInputs = with py; [
+    propagatedBuildInputs = with python313Packages; [
       anyio
       distro
       httpx
