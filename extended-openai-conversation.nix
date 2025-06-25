@@ -2,8 +2,7 @@
 , buildHomeAssistantComponent, python3, python3Packages, version, ... }:
 
 let
-  py = buildHomeAssistantComponent.python;
-  openai = py.pkgs.buildPythonPackage rec {
+  openai = python3.pkgs.buildPythonPackage rec {
     pname = "openai";
     version = "1.13.3";
     format = "setuptools";
