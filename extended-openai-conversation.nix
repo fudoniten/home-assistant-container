@@ -17,6 +17,7 @@ buildHomeAssistantComponent {
         rev = "refs/tags/v${version}";
         hash = "sha256-8SHXUrPLZ7lgvB0jqZlcvKq5Zv2d2UqXjJpgiBpR8P8=";
       };
+      propagatedBuildInputs = [ buildHomeAssistantComponent.python ];
       disabledTests = oldAttrs.disabledTests ++ [
         "test_retrying_timeout_errors_doesnt_leak"
         "test_retrying_status_errors_doesnt_leak"
