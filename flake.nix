@@ -24,7 +24,7 @@
           extended_openai_conversation =
             pkgs.callPackage ./extended-openai-conversation.nix {
               inherit extended-openai-conversation;
-              version = "1.0.3";
+              version = "1.0.5";
             };
           nodered = pkgs.callPackage ./hass-node-red.nix {
             inherit hass-node-red;
