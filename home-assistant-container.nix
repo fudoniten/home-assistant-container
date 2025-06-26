@@ -223,10 +223,12 @@ in {
                       frigate
                       ntfy
                       prometheus_sensor
-                    ]) ++ (with pkgs.home-assistant-local-components; [
-                      extended_openai_conversation
-                      nodered
-                    ]);
+                    ]) ++ (with pkgs.home-assistant-local-components;
+                      [
+                        ## This is broken...too old
+                        # extended_openai_conversation
+                        nodered
+                      ]);
                   config = {
                     "automation ui" = "!include automations.yaml";
                     "automation manual" = [ ];
