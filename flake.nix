@@ -6,7 +6,7 @@
     utils.url = "github:numtide/flake-utils";
     arion.url = "github:hercules-ci/arion";
     extended-openai-conversation = {
-      url = "github:jekalmin/extended_openai_conversation?ref=1.0.3";
+      url = "github:jekalmin/extended_openai_conversation?ref=1.0.5";
       flake = false;
     };
     hass-node-red = {
