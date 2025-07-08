@@ -182,7 +182,7 @@ in {
                     "history"
                     "ipp"
                     "kraken"
-                    # "map" # Not available
+                    "marytts"
                     "media_player"
                     "media_source"
                     "mobile_app"
