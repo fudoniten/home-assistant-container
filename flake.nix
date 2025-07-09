@@ -9,7 +9,10 @@
       url = "github:jekalmin/extended_openai_conversation?ref=1.0.5";
       flake = false;
     };
-    speak2mary.url = "github:Poeschl/speak2mary";
+    speak2mary = {
+      url = "github:Poeschl/speak2mary";
+      flake = false;
+    };
     hass-node-red = {
       url = "github:zachowj/hass-node-red?ref=v4.0.1";
       flake = false;
