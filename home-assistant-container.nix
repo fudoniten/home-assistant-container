@@ -1,10 +1,10 @@
+{ inputs, ... }:
+
 { config, lib, pkgs, ... }:
 
 with lib;
 let
   cfg = config.services.homeAssistantContainer;
-
-  hostname = config.instance.hostname;
 
   timezone = config.time.timeZone;
 
@@ -117,7 +117,7 @@ in {
     };
 
     virtualisation.arion.projects.home-assistant.settings = let
-      image = { config, ... }: {
+      image = { pkgs, config, ... }: {
         project.name = "home-assistant";
         docker-compose.volumes = { node-red-data = { }; };
         services = {
@@ -163,7 +163,6 @@ in {
                     "default_config"
                     "met"
                     "esphome"
-
                     "accuweather"
                     "adguard"
                     "androidtv"
@@ -206,7 +205,20 @@ in {
                     "upnp"
                     "wyoming"
                   ];
-                  extraPackages = pyPkgs: with pyPkgs; [ gtts pyatv ];
+                  extraPackages = pyPkgs:
+                    let
+                      speak2mary = pyPkgs.buildPythonPackage {
+                        pname = "speak2mary";
+                        version = "git";
+                        src = inputs.speak2mary;
+                        format = "setuptools";
+                        docheck = false;
+                        meta = {
+                          homepage = "https://github.com/Poeschl/speak2mary";
+                          description = "Python wrapper for MaryTTS";
+                        };
+                      };
+                    in with pyPkgs; [ gtts pyatv speak2mary ];
                   customLovelaceModules =
                     with pkgs.home-assistant-custom-lovelace-modules; [
                       bubble-card

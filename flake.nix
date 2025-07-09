@@ -9,6 +9,7 @@
       url = "github:jekalmin/extended_openai_conversation?ref=1.0.5";
       flake = false;
     };
+    speak2mary.url = "github:Poeschl/speak2mary";
     hass-node-red = {
       url = "github:zachowj/hass-node-red?ref=v4.0.1";
       flake = false;
@@ -16,16 +17,11 @@
   };
 
   outputs = { self, nixpkgs, utils, arion, extended-openai-conversation
-    , hass-node-red, ... }@inputs:
+    , hass-node-red, speak2mary, ... }@inputs:
     utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages."${system}";
       in {
-        packages = rec {
-          extended_openai_conversation =
-            pkgs.callPackage ./extended-openai-conversation.nix {
-              inherit extended-openai-conversation;
-              version = "1.0.5";
-            };
+        packages = {
           nodered = pkgs.callPackage ./hass-node-red.nix {
             inherit hass-node-red;
             version = "4.0.1";
@@ -47,8 +43,10 @@
           default = homeAssistantContainer;
           homeAssistantContainer = { ... }: {
             config.nixpkgs.overlays = [ self.overlays.default ];
-            imports =
-              [ arion.nixosModules.arion ./home-assistant-container.nix ];
+            imports = [
+              arion.nixosModules.arion
+              (import ./home-assistant-container.nix { inherit inputs; })
+            ];
           };
         };
       };
