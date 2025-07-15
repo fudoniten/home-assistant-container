@@ -5,22 +5,18 @@
     nixpkgs.url = "nixpkgs/nixos-24.05";
     utils.url = "github:numtide/flake-utils";
     arion.url = "github:hercules-ci/arion";
-    extended-openai-conversation = {
-      url = "github:jekalmin/extended_openai_conversation?ref=1.0.5";
-      flake = false;
-    };
-    speak2mary = {
-      url = "github:Poeschl/speak2mary";
-      flake = false;
-    };
     hass-node-red = {
       url = "github:zachowj/hass-node-red?ref=v4.0.1";
       flake = false;
     };
+    openai_tts = {
+      url = "github:sfortis/openai_tts/v3.3";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, utils, arion, extended-openai-conversation
-    , hass-node-red, speak2mary, ... }@inputs:
+  outputs =
+    { self, nixpkgs, utils, arion, hass-node-red, openai_tts, ... }@inputs:
     utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages."${system}";
       in {
@@ -28,6 +24,11 @@
           nodered = pkgs.callPackage ./hass-node-red.nix {
             inherit hass-node-red;
             version = "4.0.1";
+          };
+
+          openai_tts = pkgs.callPackage ./openai_tts.nix {
+            inherit openai_tts;
+            version = "v3.3";
           };
         };
       }) // {
@@ -37,7 +38,7 @@
             let localPackages = self.packages."${prev.system}";
             in {
               home-assistant-local-components = {
-                inherit (localPackages) extended_openai_conversation nodered;
+                inherit (localPackages) nodered openai_tts;
               };
             };
         };

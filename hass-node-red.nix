@@ -1,5 +1,4 @@
-{ hass-node-red, lib, fetchFromGitHub, buildHomeAssistantComponent
-, python312Packages, version, ... }:
+{ hass-node-red, buildHomeAssistantComponent, version, ... }:
 
 buildHomeAssistantComponent {
   src = hass-node-red;

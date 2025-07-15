@@ -20,23 +20,6 @@
         "type": "github"
       }
     },
-    "extended-openai-conversation": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1749300674,
-        "narHash": "sha256-peg3YO1dgpKtmhvH2Kt9AsLXyg0OmJZof0RE03Kpe8E=",
-        "owner": "jekalmin",
-        "repo": "extended_openai_conversation",
-        "rev": "f544a9dbd735826bf96ee093cff6f692f004a462",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jekalmin",
-        "ref": "1.0.5",
-        "repo": "extended_openai_conversation",
-        "type": "github"
-      }
-    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -122,30 +105,30 @@
         "type": "indirect"
       }
     },
-    "root": {
-      "inputs": {
-        "arion": "arion",
-        "extended-openai-conversation": "extended-openai-conversation",
-        "hass-node-red": "hass-node-red",
-        "nixpkgs": "nixpkgs_2",
-        "speak2mary": "speak2mary",
-        "utils": "utils"
-      }
-    },
-    "speak2mary": {
+    "openai_tts": {
       "flake": false,
       "locked": {
-        "lastModified": 1609929403,
-        "narHash": "sha256-nvjW60KBvr3rpXCkrdTWBAYyGfXYRURYOE+wEOYi9tg=",
-        "owner": "Poeschl",
-        "repo": "speak2mary",
-        "rev": "916f17f37638e6332c96240236e608f130ec3f04",
+        "lastModified": 1742800409,
+        "narHash": "sha256-GEz9CkAn9wTlLijexFfE89DFkJU3OMq6OURvFEzwXPQ=",
+        "owner": "sfortis",
+        "repo": "openai_tts",
+        "rev": "6478068c6df6f10e6aaa96c4417460f4f5bb7911",
         "type": "github"
       },
       "original": {
-        "owner": "Poeschl",
-        "repo": "speak2mary",
+        "owner": "sfortis",
+        "ref": "v3.3",
+        "repo": "openai_tts",
         "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "arion": "arion",
+        "hass-node-red": "hass-node-red",
+        "nixpkgs": "nixpkgs_2",
+        "openai_tts": "openai_tts",
+        "utils": "utils"
       }
     },
     "systems": {
