@@ -205,7 +205,12 @@ in {
                     "upnp"
                     "wyoming"
                   ];
-                  extraPackages = pyPkgs: with pyPkgs; [ gtts pyatv ];
+                  extraPackages = pyPkgs:
+                    with pyPkgs; [
+                      gtts
+                      hass-web-proxy
+                      pyatv
+                    ];
                   customLovelaceModules =
                     with pkgs.home-assistant-custom-lovelace-modules; [
                       bubble-card
