@@ -206,11 +206,18 @@ in {
                     "wyoming"
                   ];
                   extraPackages = pyPkgs:
-                    with pyPkgs; [
-                      gtts
-                      hass-web-proxy
-                      pyatv
-                    ];
+                    let
+                      hass-web-proxy = py.buildPythonPackage rec {
+                        pname = "hass-web-proxy";
+                        version = "2.0.2";
+                        src = pyPkgs.fetchPypi {
+                          inherit pname version;
+                          sha256 = "";
+                        };
+                        propagatedBuildInputs = with pyPkgs; [ aiohttp ];
+                        doCheck = false;
+                      };
+                    in with pyPkgs; [ gtts hass-web-proxy pyatv ];
                   customLovelaceModules =
                     with pkgs.home-assistant-custom-lovelace-modules; [
                       bubble-card
