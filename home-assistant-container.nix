@@ -220,7 +220,7 @@ in {
                         };
 
                         propagatedBuildInputs = with pyPkgs; [ aiohttp ];
-                        dependencies = with pyPkgs; [ aiohttp ];
+                        dependencies = with pyPkgs; [ aiohttp homeassistant ];
                         doCheck = false;
                         build-system = with pyPkgs; [
                           poetry-core
