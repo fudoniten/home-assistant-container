@@ -102,18 +102,22 @@ in {
   };
 
   config = mkIf cfg.enable {
-    systemd.tmpfiles.settings = {
-      "20-home-assistant" = let
-        mkRule = subdir: {
-          d = {
-            user = "root";
-            group = "root";
-            mode = "0700";
+    systemd = {
+      systemd.services.home-assistant.path = with pkgs; [ go2rtc ];
+
+      tmpfiles.settings = {
+        "20-home-assistant" = let
+          mkRule = subdir: {
+            d = {
+              user = "root";
+              group = "root";
+              mode = "0700";
+            };
           };
-        };
-        subdirs = [ "config" "node-red" "open-wake-word" "whisper" "piper" ];
-      in genAttrs (map (subdir: "${cfg.state-directory}/${subdir}") subdirs)
-      mkRule;
+          subdirs = [ "config" "node-red" "open-wake-word" "whisper" "piper" ];
+        in genAttrs (map (subdir: "${cfg.state-directory}/${subdir}") subdirs)
+        mkRule;
+      };
     };
 
     virtualisation.arion.projects.home-assistant.settings = let
