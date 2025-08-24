@@ -210,16 +210,23 @@ in {
                       hass-web-proxy = pyPkgs.buildPythonPackage rec {
                         pname = "hass-web-proxy-lib";
                         version = "0.0.7";
+                        pyproject = true;
+
                         src = pyPkgs.fetchPypi {
                           pname = "hass_web_proxy_lib";
                           inherit version;
                           sha256 =
                             "sha256-bhz71tNOpZ+4tSlndS+UbC3w2WW5+dAMtpk7TnnFpuQ=";
                         };
+
                         propagatedBuildInputs = with pyPkgs; [ aiohttp ];
+                        dependencies = with pyPkgs; [ aiohttp ];
                         doCheck = false;
-                        pyproject = true;
-                        build-system = with pyPkgs; [ poetry-core ];
+                        build-system = with pyPkgs; [
+                          poetry-core
+                          setuptools
+                          wheel
+                        ];
                         pythonImportsCheck = [ "hass_web_proxy_lib" ];
                       };
                     in with pyPkgs; [ gtts hass-web-proxy pyatv ];
