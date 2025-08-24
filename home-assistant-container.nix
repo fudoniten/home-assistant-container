@@ -208,8 +208,8 @@ in {
                   extraPackages = pyPkgs:
                     let
                       hass-web-proxy = pyPkgs.buildPythonPackage rec {
-                        pname = "hass-web-proxy";
-                        version = "2.0.2";
+                        pname = "hass-web-proxy-lib";
+                        version = "0.0.7";
                         src = pyPkgs.fetchPypi {
                           inherit pname version;
                           sha256 = "";
