@@ -229,7 +229,13 @@ in {
                         ];
                         pythonImportsCheck = [ "hass_web_proxy_lib" ];
                       };
-                    in with pyPkgs; [ gtts hass-web-proxy pyatv ];
+                    in with pyPkgs; [
+                      gtts
+                      grpcio
+                      "grpcio-status"
+                      hass-web-proxy
+                      pyatv
+                    ];
                   customLovelaceModules =
                     with pkgs.home-assistant-custom-lovelace-modules; [
                       bubble-card
