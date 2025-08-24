@@ -232,7 +232,7 @@ in {
                     in with pyPkgs; [
                       gtts
                       grpcio
-                      "grpcio-status"
+                      pyPkgs."grpcio-status"
                       hass-web-proxy
                       pyatv
                     ];
