@@ -211,7 +211,7 @@ in {
                         pname = "hass-web-proxy-lib";
                         version = "0.0.7";
                         src = pyPkgs.fetchPypi {
-                          prame = "hass_web_proxy_lib";
+                          pname = "hass_web_proxy_lib";
                           inherit version;
                           sha256 =
                             "sha256-bhz71tNOpZ+4tSlndS+UbC3w2WW5+dAMtpk7TnnFpuQ=";
