@@ -212,12 +212,14 @@ in {
                         version = "0.0.7";
                         src = pyPkgs.fetchPypi {
                           inherit pname version;
-                          sha256 = "";
+                          sha256 =
+                            "sha256-bhz71tNOpZ+4tSlndS+UbC3w2WW5+dAMtpk7TnnFpuQ=";
                         };
                         propagatedBuildInputs = with pyPkgs; [ aiohttp ];
                         doCheck = false;
                         pyproject = true;
-                        build-system = with pyPkgs; [ setuptools ];
+                        build-system = with pyPkgs; [ poetry-core ];
+                        pythonImportsCheck = [ "hass_web_proxy_lib" ];
                       };
                     in with pyPkgs; [ gtts hass-web-proxy pyatv ];
                   customLovelaceModules =
