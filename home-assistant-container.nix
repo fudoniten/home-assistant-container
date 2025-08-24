@@ -217,7 +217,7 @@ in {
                         propagatedBuildInputs = with pyPkgs; [ aiohttp ];
                         doCheck = false;
                         pyproject = true;
-                        build-system = [ setuptools ];
+                        build-system = with pyPkgs; [ setuptools ];
                       };
                     in with pyPkgs; [ gtts hass-web-proxy pyatv ];
                   customLovelaceModules =
