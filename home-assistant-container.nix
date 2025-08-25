@@ -103,7 +103,7 @@ in {
 
   config = mkIf cfg.enable {
     systemd = {
-      systemd.services.home-assistant.path = with pkgs; [ go2rtc ];
+      services.home-assistant.path = with pkgs; [ go2rtc ];
 
       tmpfiles.settings = {
         "20-home-assistant" = let
