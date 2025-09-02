@@ -8,6 +8,11 @@ let
 
   timezone = config.time.timeZone;
 
+  flatMapAttrs' = f: attrs:
+    listToAttrs (concatLists
+      (mapAttrsToList (a: subattrs: mapAttrsToList (b: val: f a b val) subattrs)
+        attrs));
+
 in {
   options.services.homeAssistantContainer = with types; {
     enable = mkEnableOption "Enable Home Assistant running in a container.";
@@ -55,6 +60,55 @@ in {
       type = format.type;
       description = "Extra configuration options in YAML-compatible format.";
       default = { };
+    };
+
+    extraImports = mkOption {
+      type = attrsOf path;
+      description = "Map of config name to import file.";
+      default = { };
+    };
+
+    customSimpleSentences = mkOption {
+      type = attrsOf format.type;
+      description = "Map of sentence name to intent config.";
+      default = { };
+      example = { YearOfVoice = [ "how is this year going?" ]; };
+    };
+
+    customSentences = mkOption {
+      # This is a string because it can be some kind of crazy template.
+      type = attrsOf (attrsOf str);
+      description =
+        "Map of language to sentence filename to sentence JSON configuration.";
+      default = { };
+      example = {
+        en = {
+          MopidyPlaySong = ''{ "data": [ "play {song} [by] {artist}" ] }'';
+        };
+      };
+    };
+
+    customIntents = mkOption {
+      type = attrsOf format.type;
+      description = "Map of intent name to JSON configuration.";
+      default = { };
+      example = {
+        MopidyPlaySong = {
+          action = [
+            {
+              variables = {
+                song = "{{ trigger.slots.song }}";
+                artist = "{{ trigger.slots.artist | default('') }}";
+              };
+            }
+            {
+              action = "script.mopidy_play_search";
+              data.query = "{{ song }} {{ artist }}";
+            }
+          ];
+          speech.text = "Okay, playing the song!";
+        };
+      };
     };
 
     # network-interfaces = mkOption {
@@ -156,8 +210,15 @@ in {
                       group = "hass";
                       mode = "0755";
                     };
+                    "/var/lib/home-assistant/custom_sentences"."L+" = {
+                      argument = "/etc/home-assistant/custom_sentences";
+                    };
                   };
                 };
+                environment.etc = flatMapAttrs' (lang: name: intentCfg:
+                  nameValuePair
+                  "home-assistant/custom_sentences/${lang}/${name}.yaml"
+                  intentCfg) cfg.customIntents;
                 services.home-assistant = {
                   enable = true;
                   package = pkgs.pkgsUnstable.home-assistant;
@@ -273,7 +334,6 @@ in {
                     energy = { };
                     recorder = { };
                     default_config = { };
-                    # spotify = { };
                     http = {
                       server_host = [ "0.0.0.0" ];
                       server_port = 8123;
@@ -298,7 +358,13 @@ in {
                       namespace = "hass";
                       requires_auth = false;
                     };
-                  };
+                    conversation.intents = cfg.customSentences;
+                    intent_script = let
+                      scriptConfig = pkgs.writeText "intent_scripts.yaml"
+                        (toJSON cfg.customIntents);
+                    in "!include ${scriptConfig}";
+                  } // (mapAttrs (_: filename: "!include ${filename}")
+                    cfg.extraImports);
                 };
               };
 
