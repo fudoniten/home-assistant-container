@@ -15,6 +15,8 @@ let
 
   yamlType = (pkgs.formats.yaml { }).type;
 
+  inherit (builtins) toJSON;
+
 in {
   options.services.homeAssistantContainer = with types; {
     enable = mkEnableOption "Enable Home Assistant running in a container.";
