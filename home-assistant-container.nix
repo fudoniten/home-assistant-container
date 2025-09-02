@@ -13,6 +13,8 @@ let
       (mapAttrsToList (a: subattrs: mapAttrsToList (b: val: f a b val) subattrs)
         attrs));
 
+  yamlType = (pkgs.formats.yaml { }).type;
+
 in {
   options.services.homeAssistantContainer = with types; {
     enable = mkEnableOption "Enable Home Assistant running in a container.";
@@ -55,9 +57,8 @@ in {
       default = null;
     };
 
-    extraConfig = let format = pkgs.formats.yaml { };
-    in mkOption {
-      type = format.type;
+    extraConfig = mkOption {
+      type = yamlType;
       description = "Extra configuration options in YAML-compatible format.";
       default = { };
     };
@@ -69,7 +70,7 @@ in {
     };
 
     customSimpleSentences = mkOption {
-      type = attrsOf format.type;
+      type = attrsOf yamlType;
       description = "Map of sentence name to intent config.";
       default = { };
       example = { YearOfVoice = [ "how is this year going?" ]; };
@@ -89,7 +90,7 @@ in {
     };
 
     customIntents = mkOption {
-      type = attrsOf format.type;
+      type = attrsOf yamlType;
       description = "Map of intent name to JSON configuration.";
       default = { };
       example = {
