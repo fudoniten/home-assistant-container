@@ -2,7 +2,7 @@
   description = "Home Assistant running in a container";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-24.05";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
     arion.url = "github:hercules-ci/arion";
     hass-node-red = {
