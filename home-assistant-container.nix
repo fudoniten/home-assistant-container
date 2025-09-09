@@ -162,8 +162,6 @@ in {
 
   config = mkIf cfg.enable {
     systemd = {
-      services.home-assistant.path = with pkgs; [ go2rtc ];
-
       tmpfiles.settings = {
         "20-home-assistant" = let
           mkRule = subdir: {
