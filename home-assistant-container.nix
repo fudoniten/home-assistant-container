@@ -15,6 +15,8 @@ let
 
   yamlType = (pkgs.formats.yaml { }).type;
 
+  homeAssistantPackages = with pkgs; [ go2rtc zlib-ng isal ];
+
   inherit (builtins) toJSON;
 
 in {
@@ -201,27 +203,36 @@ in {
                 ];
                 boot.tmp.useTmpfs = true;
                 system.nssModules = mkForce [ ];
-                systemd.tmpfiles.settings = {
-                  "10-home-assistant" = {
-                    "/var/lib/home-assistant/automations.yaml".f = {
-                      user = "hass";
-                      group = "hass";
-                      mode = "0755";
-                    };
-                    "/var/lib/home-assistant/scenes.yaml".f = {
-                      user = "hass";
-                      group = "hass";
-                      mode = "0755";
-                    };
-                    "/var/lib/home-assistant/custom_sentences"."L+" = {
-                      argument = "/etc/home-assistant/custom_sentences";
+                systemd = {
+                  services.home-assistant.environment.LD_LIBRARY_PATH =
+                    makeLibraryPath homeAssistantPackages;
+
+                  tmpfiles.settings = {
+                    "10-home-assistant" = {
+                      "/var/lib/home-assistant/automations.yaml".f = {
+                        user = "hass";
+                        group = "hass";
+                        mode = "0755";
+                      };
+                      "/var/lib/home-assistant/scenes.yaml".f = {
+                        user = "hass";
+                        group = "hass";
+                        mode = "0755";
+                      };
+                      "/var/lib/home-assistant/custom_sentences"."L+" = {
+                        argument = "/etc/home-assistant/custom_sentences";
+                      };
                     };
                   };
                 };
-                environment.etc = flatMapAttrs' (lang: name: intentCfg:
-                  nameValuePair
-                  "home-assistant/custom_sentences/${lang}/${name}.yaml"
-                  intentCfg) cfg.customIntents;
+                environment = {
+                  systemPackages = homeAssistantPackages;
+
+                  etc = flatMapAttrs' (lang: name: intentCfg:
+                    nameValuePair
+                    "home-assistant/custom_sentences/${lang}/${name}.yaml"
+                    intentCfg) cfg.customIntents;
+                };
                 services.home-assistant = {
                   enable = true;
                   package = pkgs.pkgsUnstable.home-assistant;
@@ -300,8 +311,10 @@ in {
                         pythonImportsCheck = [ "hass_web_proxy_lib" ];
                       };
                     in with pyPkgs; [
+                      aiohttp-fast-zlib
                       gtts
                       grpcio
+                      pyforked-daapd
                       pyPkgs."grpcio-status"
                       hass-web-proxy
                       pyatv

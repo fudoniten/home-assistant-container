@@ -6,11 +6,11 @@
     utils.url = "github:numtide/flake-utils";
     arion.url = "github:hercules-ci/arion";
     hass-node-red = {
-      url = "github:zachowj/hass-node-red?ref=v4.0.1";
+      url = "github:zachowj/hass-node-red?ref=v4.1.2";
       flake = false;
     };
     openai_tts = {
-      url = "github:sfortis/openai_tts/v3.3";
+      url = "github:sfortis/openai_tts/v3.4b5";
       flake = false;
     };
   };
@@ -23,12 +23,12 @@
         packages = {
           nodered = pkgs.callPackage ./hass-node-red.nix {
             inherit hass-node-red;
-            version = "4.0.1";
+            version = "4.1.2";
           };
 
           openai_tts = pkgs.callPackage ./openai_tts.nix {
             inherit openai_tts;
-            version = "v3.3";
+            version = "v3.4b5";
           };
         };
       }) // {
