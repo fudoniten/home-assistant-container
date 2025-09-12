@@ -312,7 +312,9 @@ in {
                       aiohttp-fast-zlib
                       gtts
                       grpcio
+                      open_meteo
                       pyforked-daapd
+                      pynws
                       pyPkgs."grpcio-status"
                       hass-web-proxy
                       pyatv
