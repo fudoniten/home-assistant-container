@@ -15,7 +15,7 @@ let
 
   yamlType = (pkgs.formats.yaml { }).type;
 
-  homeAssistantPackages = with pkgs; [ zlib-ng isal ];
+  homeAssistantPackages = with pkgs; [ zlib-ng ];
 
   inherit (builtins) toJSON;
 
