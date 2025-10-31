@@ -92,11 +92,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1761173472,
-        "narHash": "sha256-m9W0dYXflzeGgKNravKJvTMR4Qqa2MVD11AwlGMufeE=",
+        "lastModified": 1761597516,
+        "narHash": "sha256-wxX7u6D2rpkJLWkZ2E932SIvDJW8+ON/0Yy8+a5vsDU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c8aa8cc00a5cb57fada0851a038d35c08a36a2bb",
+        "rev": "daf6dc47aa4b44791372d6139ab7b25269184d55",
         "type": "github"
       },
       "original": {
@@ -108,17 +108,16 @@
     "openai_tts": {
       "flake": false,
       "locked": {
-        "lastModified": 1752650633,
-        "narHash": "sha256-S/bnosupyaOCB9kl/tMaND0RhNPmbSpSOTU2n7I2gr8=",
+        "lastModified": 1748760400,
+        "narHash": "sha256-uomHvJPWbs4SFIB92v5wHdnO42zq9yvjhInWxupn0eE=",
         "owner": "sfortis",
         "repo": "openai_tts",
-        "rev": "baa7d2142665d1ea29ffbec2132dbb8b91529e25",
+        "rev": "437d03d6e87aea780736a4cae2b6ae58d2396310",
         "type": "github"
       },
       "original": {
         "owner": "sfortis",
         "repo": "openai_tts",
-        "rev": "baa7d2142665d1ea29ffbec2132dbb8b91529e25",
         "type": "github"
       }
     },

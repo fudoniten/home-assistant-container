@@ -10,8 +10,7 @@
       flake = false;
     };
     openai_tts = {
-      url =
-        "github:sfortis/openai_tts/baa7d2142665d1ea29ffbec2132dbb8b91529e25";
+      url = "github:sfortis/openai_tts";
       flake = false;
     };
   };
