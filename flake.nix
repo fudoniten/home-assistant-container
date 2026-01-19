@@ -53,8 +53,9 @@
   outputs =
     { self, nixpkgs, utils, arion, hass-node-red, openai_tts, ... }@inputs:
 
-    # Build packages for all default systems (x86_64-linux, aarch64-linux, etc.)
-    utils.lib.eachDefaultSystem (system:
+    # Build packages only for Linux systems
+    # Home Assistant containers are Linux-only (primarily x86_64)
+    utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let pkgs = nixpkgs.legacyPackages."${system}";
       in {
         # Custom Home Assistant component packages

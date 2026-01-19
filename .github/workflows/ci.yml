@@ -42,7 +42,7 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Run flake check
-        run: nix flake check --all-systems
+        run: nix flake check --system x86_64-linux
 
   # Build packages
   build-packages:
