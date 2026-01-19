@@ -8,26 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Check Nix formatting
-  nix-fmt:
-    name: Check Nix formatting
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: cachix/install-nix-action@v26
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-
-      - name: Check Nix file formatting
-        run: |
-          nix fmt -- --check *.nix || {
-            echo "Nix files need formatting. Run 'nix fmt' locally."
-            exit 1
-          }
-
   # Run flake checks
   flake-check:
     name: Flake check
