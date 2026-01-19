@@ -25,8 +25,8 @@ let
   # Lower numbers = higher priority (runs first)
   priorities = {
     tmpfiles = {
-      host = 20;       # Host-side directory creation
-      container = 10;  # Container-side file management
+      host = 20; # Host-side directory creation
+      container = 10; # Container-side file management
     };
   };
 
@@ -212,12 +212,14 @@ in {
         options = {
           requires-auth = mkOption {
             type = bool;
-            description = "Whether Prometheus metrics endpoint requires authentication.";
+            description =
+              "Whether Prometheus metrics endpoint requires authentication.";
             default = false;
           };
         };
       });
-      description = "Prometheus metrics export configuration. Set to null to disable.";
+      description =
+        "Prometheus metrics export configuration. Set to null to disable.";
       default = { };
     };
 
@@ -235,7 +237,8 @@ in {
     # Measurement unit system
     unit-system = mkOption {
       type = enum [ "metric" "imperial" "us_customary" ];
-      description = "Unit system for distances, weights, and volumes. metric = km/kg/L, imperial = mi/lb/gal (UK), us_customary = mi/lb/gal (US).";
+      description =
+        "Unit system for distances, weights, and volumes. metric = km/kg/L, imperial = mi/lb/gal (UK), us_customary = mi/lb/gal (US).";
       default = "metric";
       example = "imperial";
     };
@@ -268,7 +271,8 @@ in {
     # Use ISO 639-1 two-letter language codes (en, es, fr, de, etc.)
     whisper.language = mkOption {
       type = str;
-      description = "Language for speech recognition. Use ISO 639-1 codes (en, es, fr, de, etc.).";
+      description =
+        "Language for speech recognition. Use ISO 639-1 codes (en, es, fr, de, etc.).";
       default = "en";
       example = "es";
     };
@@ -321,36 +325,46 @@ in {
     assertions = [
       {
         assertion = cfg.state-directory != "";
-        message = "services.homeAssistantContainer.state-directory must be set to a valid path";
+        message =
+          "services.homeAssistantContainer.state-directory must be set to a valid path";
       }
       {
-        assertion = !isNull cfg.position -> (cfg.position.latitude >= -90.0 && cfg.position.latitude <= 90.0);
-        message = "services.homeAssistantContainer.position.latitude must be between -90 and 90 degrees";
+        assertion = !isNull cfg.position
+          -> (cfg.position.latitude >= -90.0 && cfg.position.latitude <= 90.0);
+        message =
+          "services.homeAssistantContainer.position.latitude must be between -90 and 90 degrees";
       }
       {
-        assertion = !isNull cfg.position -> (cfg.position.longitude >= -180.0 && cfg.position.longitude <= 180.0);
-        message = "services.homeAssistantContainer.position.longitude must be between -180 and 180 degrees";
+        assertion = !isNull cfg.position -> (cfg.position.longitude >= -180.0
+          && cfg.position.longitude <= 180.0);
+        message =
+          "services.homeAssistantContainer.position.longitude must be between -180 and 180 degrees";
       }
       # Container image assertions - users must explicitly specify all images
       {
         assertion = cfg.images.home-assistant != "";
-        message = "services.homeAssistantContainer.images.home-assistant must be explicitly set (e.g., 'ghcr.io/home-assistant/home-assistant:stable')";
+        message =
+          "services.homeAssistantContainer.images.home-assistant must be explicitly set (e.g., 'ghcr.io/home-assistant/home-assistant:stable')";
       }
       {
         assertion = cfg.images.node-red != "";
-        message = "services.homeAssistantContainer.images.node-red must be explicitly set (e.g., 'nodered/node-red:latest')";
+        message =
+          "services.homeAssistantContainer.images.node-red must be explicitly set (e.g., 'nodered/node-red:latest')";
       }
       {
         assertion = cfg.images.open-wake-word != "";
-        message = "services.homeAssistantContainer.images.open-wake-word must be explicitly set (e.g., 'rhasspy/wyoming-openwakeword:latest')";
+        message =
+          "services.homeAssistantContainer.images.open-wake-word must be explicitly set (e.g., 'rhasspy/wyoming-openwakeword:latest')";
       }
       {
         assertion = cfg.images.whisper != "";
-        message = "services.homeAssistantContainer.images.whisper must be explicitly set (e.g., 'rhasspy/wyoming-whisper:latest')";
+        message =
+          "services.homeAssistantContainer.images.whisper must be explicitly set (e.g., 'rhasspy/wyoming-whisper:latest')";
       }
       {
         assertion = cfg.images.piper != "";
-        message = "services.homeAssistantContainer.images.piper must be explicitly set (e.g., 'rhasspy/wyoming-piper:latest')";
+        message =
+          "services.homeAssistantContainer.images.piper must be explicitly set (e.g., 'rhasspy/wyoming-piper:latest')";
       }
     ];
 
@@ -423,25 +437,26 @@ in {
 
                   # Create required files and symlinks inside the container
                   tmpfiles.settings = {
-                    "${toString priorities.tmpfiles.container}-home-assistant" = {
-                      # Create empty YAML files if they don't exist
-                      # Home Assistant will populate these through the UI
-                      "/var/lib/home-assistant/automations.yaml".f = {
-                        user = "hass";
-                        group = "hass";
-                        mode = "0644";  # Read/write for owner, read for group
+                    "${toString priorities.tmpfiles.container}-home-assistant" =
+                      {
+                        # Create empty YAML files if they don't exist
+                        # Home Assistant will populate these through the UI
+                        "/var/lib/home-assistant/automations.yaml".f = {
+                          user = "hass";
+                          group = "hass";
+                          mode = "0644"; # Read/write for owner, read for group
+                        };
+                        "/var/lib/home-assistant/scenes.yaml".f = {
+                          user = "hass";
+                          group = "hass";
+                          mode = "0644"; # Read/write for owner, read for group
+                        };
+                        # Symlink custom sentence files from /etc to config directory
+                        # This makes Nix-managed sentence configs available to Home Assistant
+                        "/var/lib/home-assistant/custom_sentences"."L+" = {
+                          argument = "/etc/home-assistant/custom_sentences";
+                        };
                       };
-                      "/var/lib/home-assistant/scenes.yaml".f = {
-                        user = "hass";
-                        group = "hass";
-                        mode = "0644";  # Read/write for owner, read for group
-                      };
-                      # Symlink custom sentence files from /etc to config directory
-                      # This makes Nix-managed sentence configs available to Home Assistant
-                      "/var/lib/home-assistant/custom_sentences"."L+" = {
-                        argument = "/etc/home-assistant/custom_sentences";
-                      };
-                    };
                   };
                 };
                 environment = {
@@ -511,7 +526,7 @@ in {
                     "synology_dsm"
                     "tile"
                     "upnp"
-                    "wyoming"  # Wyoming Protocol for voice assistants
+                    "wyoming" # Wyoming Protocol for voice assistants
                   ];
 
                   # Additional Python packages required by components
@@ -542,42 +557,42 @@ in {
                         pythonImportsCheck = [ "hass_web_proxy_lib" ];
                       };
                     in with pyPkgs; [
-                      aiohttp-fast-zlib  # Faster compression for web requests
-                      gtts               # Google Text-to-Speech
-                      grpcio             # gRPC support for Nest/Google integrations
-                      pyforked-daapd     # DAAP/iTunes library integration
-                      pynws              # National Weather Service API
-                      pyPkgs."grpcio-status"  # gRPC status codes
-                      hass-web-proxy     # Web proxy support (custom build)
-                      pyatv              # Apple TV integration
+                      aiohttp-fast-zlib # Faster compression for web requests
+                      gtts # Google Text-to-Speech
+                      grpcio # gRPC support for Nest/Google integrations
+                      pyforked-daapd # DAAP/iTunes library integration
+                      pynws # National Weather Service API
+                      pyPkgs."grpcio-status" # gRPC status codes
+                      hass-web-proxy # Web proxy support (custom build)
+                      pyatv # Apple TV integration
                     ];
 
                   # Custom Lovelace UI cards from nixpkgs
                   # These enhance the Home Assistant frontend with additional card types
                   customLovelaceModules =
                     with pkgs.home-assistant-custom-lovelace-modules; [
-                      bubble-card          # Modern bubble-style cards
-                      button-card          # Highly customizable buttons
-                      card-mod             # CSS styling for cards
-                      mini-graph-card      # Compact history graphs
-                      mini-media-player    # Compact media player controls
-                      multiple-entity-row  # Multiple entities per row
-                      mushroom             # Minimalist card theme
-                      weather-card         # Animated weather cards
+                      bubble-card # Modern bubble-style cards
+                      button-card # Highly customizable buttons
+                      card-mod # CSS styling for cards
+                      mini-graph-card # Compact history graphs
+                      mini-media-player # Compact media player controls
+                      multiple-entity-row # Multiple entities per row
+                      mushroom # Minimalist card theme
+                      weather-card # Animated weather cards
                     ];
 
                   # Custom components (third-party integrations)
                   customComponents =
                     # Components from nixpkgs
                     (with pkgs.home-assistant-custom-components; [
-                      frigate            # NVR with object detection
-                      ntfy               # Simple push notifications
-                      prometheus_sensor  # Custom Prometheus metrics
+                      frigate # NVR with object detection
+                      ntfy # Simple push notifications
+                      prometheus_sensor # Custom Prometheus metrics
                     ]) ++
                     # Components built by this flake
                     (with pkgs.home-assistant-local-components; [
-                      nodered            # Node-Red integration
-                      openai_tts         # OpenAI text-to-speech
+                      nodered # Node-Red integration
+                      openai_tts # OpenAI text-to-speech
                     ]);
 
                   # Home Assistant configuration.yaml generation
@@ -591,18 +606,18 @@ in {
                     "scene manual" = [ ];
 
                     # Core integrations
-                    mobile_app = { };        # Mobile app companion support
-                    cloud = { };             # Nabu Casa cloud services
-                    history = { };           # Historical data tracking
-                    energy = { };            # Energy monitoring dashboard
-                    recorder = { };          # Database recording
-                    default_config = { };    # Load default configuration
+                    mobile_app = { }; # Mobile app companion support
+                    cloud = { }; # Nabu Casa cloud services
+                    history = { }; # Historical data tracking
+                    energy = { }; # Energy monitoring dashboard
+                    recorder = { }; # Database recording
+                    default_config = { }; # Load default configuration
 
                     # HTTP server configuration
                     http = {
-                      server_host = [ "0.0.0.0" ];  # Listen on all interfaces
+                      server_host = [ "0.0.0.0" ]; # Listen on all interfaces
                       server_port = 8123;
-                      use_x_forwarded_for = true;   # Trust proxy headers
+                      use_x_forwarded_for = true; # Trust proxy headers
                       # Trusted proxy networks (for reverse proxy setups)
                       # Configurable via trusted-proxies option
                       trusted_proxies = cfg.trusted-proxies;
@@ -610,10 +625,11 @@ in {
 
                     # General Home Assistant settings
                     homeassistant = {
-                      name = cfg.name;                    # Configurable display name
-                      temperature_unit = cfg.temperature-unit;  # Configurable temperature unit
-                      time_zone = timezone;               # From system config
-                      unit_system = cfg.unit-system;      # Configurable unit system
+                      name = cfg.name; # Configurable display name
+                      temperature_unit =
+                        cfg.temperature-unit; # Configurable temperature unit
+                      time_zone = timezone; # From system config
+                      unit_system = cfg.unit-system; # Configurable unit system
                     } // (optionalAttrs (!isNull cfg.position) {
                       # Geographic coordinates (if configured)
                       latitude = cfg.position.latitude;
@@ -643,7 +659,7 @@ in {
                         (toJSON cfg.customIntents);
                     in "!include ${scriptConfig}";
 
-                  # Merge extra configuration file imports
+                    # Merge extra configuration file imports
                   } // (mapAttrs (_: filename: "!include ${filename}")
                     cfg.extraImports);
                 };
@@ -660,7 +676,8 @@ in {
           node-red.service = {
             image = cfg.images.node-red;
             restart = "always";
-            volumes = [ "node-red-data:/data" ];  # Named volume for flows and settings
+            volumes =
+              [ "node-red-data:/data" ]; # Named volume for flows and settings
             environment.TZ = timezone;
             ports = [ "${toString cfg.ports.node-red}:1880" ];
           };
@@ -697,11 +714,11 @@ in {
             command = concatStringsSep " " [
               "-m wyoming_faster_whisper"
               "--uri tcp://0.0.0.0:10300"
-              "--model ${cfg.whisper.model}"      # Configurable model size
-              "--beam-size 1"                     # Faster decoding (less accurate)
+              "--model ${cfg.whisper.model}" # Configurable model size
+              "--beam-size 1" # Faster decoding (less accurate)
               "--language ${cfg.whisper.language}" # Configurable language
-              "--data-dir /data"                  # Model storage location
-              "--download-dir /data"              # Model download location
+              "--data-dir /data" # Model storage location
+              "--download-dir /data" # Model download location
             ];
             ports = [ "10300:10300" ];
           };

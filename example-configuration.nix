@@ -12,9 +12,7 @@
 
 {
   # Import the Home Assistant Container module
-  imports = [
-    inputs.home-assistant-container.nixosModules.default
-  ];
+  imports = [ inputs.home-assistant-container.nixosModules.default ];
 
   # Required: Add nixpkgs-unstable overlay for Home Assistant packages
   nixpkgs.overlays = [
@@ -42,7 +40,7 @@
     # REQUIRED: Your geographic location
     # Used for weather, sunrise/sunset times, and location-based automations
     position = {
-      latitude = 47.6062;    # Replace with your latitude
+      latitude = 47.6062; # Replace with your latitude
       longitude = -122.3321; # Replace with your longitude
     };
 
@@ -52,7 +50,7 @@
 
     # Display name for your Home Assistant instance
     # This appears in the UI and helps identify your home
-    name = "My Smart Home";  # Default: "Home"
+    name = "My Smart Home"; # Default: "Home"
 
     # Trusted proxy networks for reverse proxy setups
     # Only these networks can send X-Forwarded-For headers
@@ -62,7 +60,7 @@
     # Prometheus metrics configuration
     # Set to null to disable metrics export
     prometheus = {
-      requires-auth = false;  # Set to true to require authentication
+      requires-auth = false; # Set to true to require authentication
     };
 
     # ============================================================================
@@ -70,11 +68,11 @@
     # ============================================================================
 
     ports = {
-      home-assistant = 8123;  # Web interface
-      node-red = 1880;        # Node-Red editor
-      piper = 10200;          # Text-to-speech service
-      whisper = 10300;        # Speech-to-text service
-      wake-word = 10400;      # Wake word detection
+      home-assistant = 8123; # Web interface
+      node-red = 1880; # Node-Red editor
+      piper = 10200; # Text-to-speech service
+      whisper = 10300; # Speech-to-text service
+      wake-word = 10400; # Wake word detection
     };
 
     # ============================================================================
@@ -94,7 +92,7 @@
 
       # Language for speech recognition
       # Use ISO 639-1 two-letter language codes (en, es, fr, de, it, etc.)
-      language = "en";  # Default: "en"
+      language = "en"; # Default: "en"
     };
 
     # Text-to-speech (Piper) voice
@@ -149,7 +147,7 @@
     # Import additional configuration files from state-directory
     # These files should exist in /var/lib/home-assistant/
     extraImports = [
-      "secrets.yaml"      # Store sensitive data here
+      "secrets.yaml" # Store sensitive data here
       # "customize.yaml"  # Entity customizations
       # "groups.yaml"     # Group definitions
     ];
@@ -206,13 +204,13 @@
   networking.firewall = {
     # Allow access to Home Assistant web interface
     allowedTCPPorts = [
-      8123  # Home Assistant
+      8123 # Home Assistant
       # 1880  # Uncomment to allow remote Node-Red access
     ];
 
     # Allow mDNS for automatic device discovery
     allowedUDPPorts = [
-      5353  # mDNS/Zeroconf
+      5353 # mDNS/Zeroconf
     ];
 
     # Optional: Allow specific IP ranges (useful for mobile apps)
