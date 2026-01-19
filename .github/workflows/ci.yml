@@ -89,12 +89,15 @@ jobs:
           cat > test-config.nix << 'EOF'
           { config, pkgs, lib, ... }:
           {
-            imports = [ ./home-assistant-container.nix ];
-
-            # Mock required inputs
-            _module.args.inputs = {
-              nixpkgs = lib.fakeNixpkgs;
-            };
+            # Import the module correctly - it's a function that takes inputs
+            imports = [
+              (import ./home-assistant-container.nix {
+                inputs = {
+                  # Mock inputs for testing
+                  nixpkgs = null;
+                };
+              })
+            ];
 
             services.homeAssistantContainer = {
               enable = true;
