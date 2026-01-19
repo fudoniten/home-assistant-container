@@ -132,10 +132,21 @@ Home Assistant requires packages from nixpkgs-unstable. Add this to your configu
     enable = true;
     state-directory = "/var/lib/home-assistant";
 
+    # Display name
+    name = "My Smart Home";
+
     # Location configuration
     position = {
       latitude = 47.6062;
       longitude = -122.3321;
+    };
+
+    # Network configuration
+    trusted-proxies = [ "127.0.0.0/16" "10.0.0.0/16" "::1" ];
+
+    # Prometheus metrics (set to null to disable)
+    prometheus = {
+      requires-auth = false;  # Set to true for authentication
     };
 
     # Port mappings (defaults shown)
@@ -149,7 +160,10 @@ Home Assistant requires packages from nixpkgs-unstable. Add this to your configu
 
     # Voice assistant configuration
     wake-word = "hey_jarvis";  # Wake word model name
-    whisper.model = "tiny-int8";  # STT model: tiny-int8, base, small, medium, large
+    whisper = {
+      model = "tiny-int8";     # STT model: tiny-int8, base, small, medium, large
+      language = "en";          # Language: en, es, fr, de, etc.
+    };
     piper.voice = "en-gb-southern_english_female-low";  # TTS voice
 
     # Nest thermostat credentials (optional)

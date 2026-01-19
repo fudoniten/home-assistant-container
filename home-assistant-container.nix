@@ -175,6 +175,43 @@ in {
       description = "Path at which to store Home Assistant state data.";
     };
 
+    # Display name for the Home Assistant instance
+    # This appears in the UI and can help identify your home
+    name = mkOption {
+      type = str;
+      description = "Display name for your Home Assistant instance.";
+      default = "Home";
+      example = "My Smart Home";
+    };
+
+    # Network configuration
+    # Controls proxy and network security settings
+
+    # Trusted proxy networks for reverse proxy setups
+    # These networks can send X-Forwarded-For headers that Home Assistant will trust
+    # Default includes localhost and typical Docker/home network ranges
+    trusted-proxies = mkOption {
+      type = listOf str;
+      description = "List of trusted proxy networks in CIDR notation.";
+      default = [ "127.0.0.0/16" "10.0.0.0/16" "::1" ];
+      example = [ "127.0.0.1" "192.168.1.100" ];
+    };
+
+    # Prometheus metrics configuration
+    prometheus = mkOption {
+      type = nullOr (submodule {
+        options = {
+          requires-auth = mkOption {
+            type = bool;
+            description = "Whether Prometheus metrics endpoint requires authentication.";
+            default = false;
+          };
+        };
+      });
+      description = "Prometheus metrics export configuration. Set to null to disable.";
+      default = { };
+    };
+
     # Voice assistant configuration
     # These options configure the Wyoming Protocol voice services
 
@@ -198,6 +235,16 @@ in {
       default = "tiny-int8";
     };
 
+    # Speech-to-text language
+    # Specifies which language Whisper should recognize
+    # Use ISO 639-1 two-letter language codes (en, es, fr, de, etc.)
+    whisper.language = mkOption {
+      type = str;
+      description = "Language for speech recognition. Use ISO 639-1 codes (en, es, fr, de, etc.).";
+      default = "en";
+      example = "es";
+    };
+
     # Text-to-speech (Piper) voice selection
     # Browse available voices at: https://rhasspy.github.io/piper-samples/
     # Format: <language>-<region>-<name>-<quality>
@@ -217,8 +264,16 @@ in {
     position = let
       posOpts = {
         options = {
-          latitude = mkOption { type = float; };
-          longitude = mkOption { type = float; };
+          latitude = mkOption {
+            type = float;
+            description = "Latitude in degrees. Valid range: -90 to 90.";
+            example = 47.6062;
+          };
+          longitude = mkOption {
+            type = float;
+            description = "Longitude in degrees. Valid range: -180 to 180.";
+            example = -122.3321;
+          };
         };
       };
     in mkOption {
@@ -234,6 +289,22 @@ in {
   # ============================================================================
 
   config = mkIf cfg.enable {
+    # Input validation assertions
+    assertions = [
+      {
+        assertion = cfg.state-directory != "";
+        message = "services.homeAssistantContainer.state-directory must be set to a valid path";
+      }
+      {
+        assertion = !isNull cfg.position -> (cfg.position.latitude >= -90.0 && cfg.position.latitude <= 90.0);
+        message = "services.homeAssistantContainer.position.latitude must be between -90 and 90 degrees";
+      }
+      {
+        assertion = !isNull cfg.position -> (cfg.position.longitude >= -180.0 && cfg.position.longitude <= 180.0);
+        message = "services.homeAssistantContainer.position.longitude must be between -180 and 180 degrees";
+      }
+    ];
+
     # Create required directories for container state storage
     # Each service gets its own subdirectory to isolate data
     # These directories are created on the host and mounted into containers
@@ -484,13 +555,13 @@ in {
                       server_port = 8123;
                       use_x_forwarded_for = true;   # Trust proxy headers
                       # Trusted proxy networks (for reverse proxy setups)
-                      # localhost and private network ranges
-                      trusted_proxies = [ "127.0.0.0/16" "10.0.0.0/8" "::1" ];
+                      # Configurable via trusted-proxies option
+                      trusted_proxies = cfg.trusted-proxies;
                     };
 
                     # General Home Assistant settings
                     homeassistant = {
-                      name = "Seattle";              # Display name (TODO: make configurable)
+                      name = cfg.name;               # Configurable display name
                       temperature_unit = "C";        # Celsius
                       time_zone = timezone;          # From system config
                       unit_system = "metric";        # Metric units (km, kg, etc.)
@@ -507,11 +578,10 @@ in {
                       project_id = cfg.nest.project-id;
                     };
 
-                    # Prometheus metrics export
-                    # WARNING: No authentication required - only enable on trusted networks
-                    prometheus = {
+                    # Prometheus metrics export (if configured)
+                    prometheus = mkIf (!isNull cfg.prometheus) {
                       namespace = "hass";
-                      requires_auth = false;
+                      requires_auth = cfg.prometheus.requires-auth;
                     };
 
                     # Voice conversation configuration
@@ -578,11 +648,11 @@ in {
             command = concatStringsSep " " [
               "-m wyoming_faster_whisper"
               "--uri tcp://0.0.0.0:10300"
-              "--model ${cfg.whisper.model}"  # Configurable model size
-              "--beam-size 1"                 # Faster decoding (less accurate)
-              "--language en"                 # English only (TODO: make configurable)
-              "--data-dir /data"              # Model storage location
-              "--download-dir /data"          # Model download location
+              "--model ${cfg.whisper.model}"      # Configurable model size
+              "--beam-size 1"                     # Faster decoding (less accurate)
+              "--language ${cfg.whisper.language}" # Configurable language
+              "--data-dir /data"                  # Model storage location
+              "--download-dir /data"              # Model download location
             ];
             ports = [ "10300:10300" ];
           };

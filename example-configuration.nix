@@ -47,6 +47,25 @@
     };
 
     # ============================================================================
+    # Optional: General Configuration
+    # ============================================================================
+
+    # Display name for your Home Assistant instance
+    # This appears in the UI and helps identify your home
+    name = "My Smart Home";  # Default: "Home"
+
+    # Trusted proxy networks for reverse proxy setups
+    # Only these networks can send X-Forwarded-For headers
+    # Default: ["127.0.0.0/16" "10.0.0.0/16" "::1"]
+    trusted-proxies = [ "127.0.0.0/16" "10.0.0.0/16" "::1" ];
+
+    # Prometheus metrics configuration
+    # Set to null to disable metrics export
+    prometheus = {
+      requires-auth = false;  # Set to true to require authentication
+    };
+
+    # ============================================================================
     # Port Configuration (Optional - defaults shown)
     # ============================================================================
 
@@ -66,10 +85,17 @@
     # Available: hey_jarvis, ok_nabu, alexa, hey_mycroft, hey_rhasspy
     wake-word = "hey_jarvis";
 
-    # Speech-to-text (Whisper) model
-    # Options: tiny-int8 (fastest), base, small, medium, large (most accurate)
-    # Larger models require more CPU/memory but are more accurate
-    whisper.model = "tiny-int8";
+    # Speech-to-text (Whisper) configuration
+    whisper = {
+      # Model selection
+      # Options: tiny-int8 (fastest), base, small, medium, large (most accurate)
+      # Larger models require more CPU/memory but are more accurate
+      model = "tiny-int8";
+
+      # Language for speech recognition
+      # Use ISO 639-1 two-letter language codes (en, es, fr, de, it, etc.)
+      language = "en";  # Default: "en"
+    };
 
     # Text-to-speech (Piper) voice
     # Browse available voices at: https://rhasspy.github.io/piper-samples/
