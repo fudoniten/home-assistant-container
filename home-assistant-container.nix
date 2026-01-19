@@ -21,6 +21,15 @@ with lib;
 let
   cfg = config.services.homeAssistantContainer;
 
+  # Priority constants for systemd tmpfiles
+  # Lower numbers = higher priority (runs first)
+  priorities = {
+    tmpfiles = {
+      host = 20;       # Host-side directory creation
+      container = 10;  # Container-side file management
+    };
+  };
+
   # Use system timezone for all containers
   timezone = config.time.timeZone;
 
@@ -212,6 +221,25 @@ in {
       default = { };
     };
 
+    # Unit configuration
+    # Controls temperature and measurement units in the UI
+
+    # Temperature unit for display
+    temperature-unit = mkOption {
+      type = enum [ "C" "F" ];
+      description = "Temperature unit: C (Celsius) or F (Fahrenheit).";
+      default = "C";
+      example = "F";
+    };
+
+    # Measurement unit system
+    unit-system = mkOption {
+      type = enum [ "metric" "imperial" "us_customary" ];
+      description = "Unit system for distances, weights, and volumes. metric = km/kg/L, imperial = mi/lb/gal (UK), us_customary = mi/lb/gal (US).";
+      default = "metric";
+      example = "imperial";
+    };
+
     # Voice assistant configuration
     # These options configure the Wyoming Protocol voice services
 
@@ -303,6 +331,27 @@ in {
         assertion = !isNull cfg.position -> (cfg.position.longitude >= -180.0 && cfg.position.longitude <= 180.0);
         message = "services.homeAssistantContainer.position.longitude must be between -180 and 180 degrees";
       }
+      # Container image assertions - users must explicitly specify all images
+      {
+        assertion = cfg.images.home-assistant != "";
+        message = "services.homeAssistantContainer.images.home-assistant must be explicitly set (e.g., 'ghcr.io/home-assistant/home-assistant:stable')";
+      }
+      {
+        assertion = cfg.images.node-red != "";
+        message = "services.homeAssistantContainer.images.node-red must be explicitly set (e.g., 'nodered/node-red:latest')";
+      }
+      {
+        assertion = cfg.images.open-wake-word != "";
+        message = "services.homeAssistantContainer.images.open-wake-word must be explicitly set (e.g., 'rhasspy/wyoming-openwakeword:latest')";
+      }
+      {
+        assertion = cfg.images.whisper != "";
+        message = "services.homeAssistantContainer.images.whisper must be explicitly set (e.g., 'rhasspy/wyoming-whisper:latest')";
+      }
+      {
+        assertion = cfg.images.piper != "";
+        message = "services.homeAssistantContainer.images.piper must be explicitly set (e.g., 'rhasspy/wyoming-piper:latest')";
+      }
     ];
 
     # Create required directories for container state storage
@@ -310,7 +359,7 @@ in {
     # These directories are created on the host and mounted into containers
     systemd = {
       tmpfiles.settings = {
-        "20-home-assistant" = let
+        "${toString priorities.tmpfiles.host}-home-assistant" = let
           mkRule = subdir: {
             d = {
               user = "root";
@@ -374,7 +423,7 @@ in {
 
                   # Create required files and symlinks inside the container
                   tmpfiles.settings = {
-                    "10-home-assistant" = {
+                    "${toString priorities.tmpfiles.container}-home-assistant" = {
                       # Create empty YAML files if they don't exist
                       # Home Assistant will populate these through the UI
                       "/var/lib/home-assistant/automations.yaml".f = {
@@ -561,10 +610,10 @@ in {
 
                     # General Home Assistant settings
                     homeassistant = {
-                      name = cfg.name;               # Configurable display name
-                      temperature_unit = "C";        # Celsius
-                      time_zone = timezone;          # From system config
-                      unit_system = "metric";        # Metric units (km, kg, etc.)
+                      name = cfg.name;                    # Configurable display name
+                      temperature_unit = cfg.temperature-unit;  # Configurable temperature unit
+                      time_zone = timezone;               # From system config
+                      unit_system = cfg.unit-system;      # Configurable unit system
                     } // (optionalAttrs (!isNull cfg.position) {
                       # Geographic coordinates (if configured)
                       latitude = cfg.position.latitude;

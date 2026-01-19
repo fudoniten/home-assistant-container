@@ -69,12 +69,27 @@
 
           # OpenAI TTS component
           # Provides text-to-speech using OpenAI's voice models
-          # Note: version string doesn't match git ref (uses latest from main)
+          # FIXME: Version string doesn't match git ref
+          # The input uses latest from main branch, but version is set to v3.4b5
+          # Should either:
+          #   1. Pin input to tag: url = "github:sfortis/openai_tts?ref=v3.4b5"
+          #   2. Use dynamic version: version = "unstable-${openai_tts.shortRev}"
           openai_tts = pkgs.callPackage ./openai_tts.nix {
             inherit openai_tts;
-            version = "v3.4b5";  # Display version (not git ref)
+            version = "v3.4b5";
           };
         };
+
+        # Checks for CI/CD
+        # These validate that the packages build correctly
+        checks = {
+          # Verify that both custom components build successfully
+          inherit (self.packages.${system}) nodered openai_tts;
+        };
+
+        # Formatter for `nix fmt`
+        # Use nixfmt-rfc-style for consistent Nix code formatting
+        formatter = pkgs.nixfmt-rfc-style;
       }) // {
         # ======================================================================
         # Overlays

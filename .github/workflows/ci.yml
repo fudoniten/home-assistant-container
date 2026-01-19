@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  # Check Nix formatting
+  nix-fmt:
+    name: Check Nix formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Check Nix file formatting
+        run: |
+          nix fmt -- --check *.nix || {
+            echo "Nix files need formatting. Run 'nix fmt' locally."
+            exit 1
+          }
+
+  # Run flake checks
+  flake-check:
+    name: Flake check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Run flake check
+        run: nix flake check --all-systems
+
+  # Build packages
+  build-packages:
+    name: Build packages
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [nodered, openai_tts]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Set up Cachix
+        uses: cachix/cachix-action@v14
+        with:
+          name: nix-community
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          skipPush: true  # Only use cache, don't push
+
+      - name: Build ${{ matrix.package }}
+        run: nix build .#${{ matrix.package }} --print-build-logs
+
+  # Evaluate NixOS module
+  evaluate-module:
+    name: Evaluate NixOS module
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Evaluate module
+        run: |
+          # Create a minimal test configuration
+          cat > test-config.nix << 'EOF'
+          { config, pkgs, lib, ... }:
+          {
+            imports = [ ./home-assistant-container.nix ];
+
+            # Mock required inputs
+            _module.args.inputs = {
+              nixpkgs = lib.fakeNixpkgs;
+            };
+
+            services.homeAssistantContainer = {
+              enable = true;
+              state-directory = "/var/lib/home-assistant";
+              position = {
+                latitude = 47.6062;
+                longitude = -122.3321;
+              };
+              # Provide required container images
+              images = {
+                home-assistant = "ghcr.io/home-assistant/home-assistant:latest";
+                node-red = "nodered/node-red:latest";
+                open-wake-word = "rhasspy/wyoming-openwakeword:latest";
+                whisper = "rhasspy/wyoming-whisper:latest";
+                piper = "rhasspy/wyoming-piper:latest";
+              };
+            };
+          }
+          EOF
+
+          # Try to evaluate the module (checks for syntax errors and type issues)
+          nix-instantiate --eval -E '
+            let
+              nixpkgs = builtins.getFlake "nixpkgs";
+              lib = nixpkgs.lib;
+            in
+            (lib.evalModules {
+              modules = [ ./test-config.nix ];
+            }).config.services.homeAssistantContainer.enable
+          ' && echo "Module evaluation successful"
