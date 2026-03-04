@@ -14,11 +14,13 @@
 #
 # Source: https://github.com/sfortis/openai_tts
 
-{ openai_tts, buildHomeAssistantComponent, version, ... }:
+{ openai_tts, buildHomeAssistantComponent, version, python3Packages, ... }:
 
 buildHomeAssistantComponent {
   src = openai_tts;
   owner = "sfortis";
   domain = "openai_tts";
   version = version;
+
+  propagatedBuildInputs = with python3Packages; [ aiohttp ];
 }
