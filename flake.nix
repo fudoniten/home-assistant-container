@@ -20,10 +20,7 @@
   # ============================================================================
 
   inputs = {
-    # NixOS 25.05 stable channel for core packages
-    nixpkgs.url = "nixpkgs/nixos-25.05";
-
-    # Flake utilities for multi-system support
+    nixpkgs.url = "nixpkgs/nixos-25.11";
     utils.url = "github:numtide/flake-utils";
 
     # Arion - Nix-based Docker Compose manager

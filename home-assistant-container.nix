@@ -488,6 +488,7 @@ in {
                     "adguard"
                     "androidtv"
                     "androidtv_remote"
+                    "anthropic"
                     "api"
                     "august"
                     "binary_sensor"
