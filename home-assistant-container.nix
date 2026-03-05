@@ -44,7 +44,7 @@ let
   yamlType = (pkgs.formats.yaml { }).type;
 
   # System packages required by Home Assistant for native library support
-  homeAssistantPackages = with pkgs; [ zlib-ng ffmpeg ];
+  homeAssistantPackages = with pkgs; [ zlib-ng ffmpeg go2rtc ];
 
   inherit (builtins) toJSON;
 
@@ -56,11 +56,10 @@ in {
   options.services.homeAssistantContainer = with types; {
     enable = mkEnableOption "Enable Home Assistant running in a container.";
 
-    # Container image overrides
-    # By default, images come from nixpkgs, but these options allow specifying
-    # custom image references (useful for testing or pinning versions)
+    # Container image configuration for Docker-based services
+    # The home-assistant container is built from nixpkgs (via Arion's nixos mode)
+    # and does not use a Docker image — its version tracks pkgs.home-assistant.
     images = genAttrs [
-      "home-assistant"
       "node-red"
       "open-wake-word"
       "whisper"
@@ -341,11 +340,7 @@ in {
           "services.homeAssistantContainer.position.longitude must be between -180 and 180 degrees";
       }
       # Container image assertions - users must explicitly specify all images
-      {
-        assertion = cfg.images.home-assistant != "";
-        message =
-          "services.homeAssistantContainer.images.home-assistant must be explicitly set (e.g., 'ghcr.io/home-assistant/home-assistant:stable')";
-      }
+      # Note: home-assistant is excluded; it is built from pkgs.home-assistant via Arion's nixos mode
       {
         assertion = cfg.images.node-red != "";
         message =
