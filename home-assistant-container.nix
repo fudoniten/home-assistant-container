@@ -21,6 +21,11 @@ with lib;
 let
   cfg = config.services.homeAssistantContainer;
 
+  pkgsUnstable = import inputs.nixpkgsUnstable {
+    system = pkgs.system;
+    overlays = [ inputs.self.overlays.default ];
+  };
+
   # Priority constants for systemd tmpfiles
   # Lower numbers = higher priority (runs first)
   priorities = {
@@ -414,14 +419,6 @@ in {
             nixos = {
               useSystemd = true;
               configuration = {
-                # Use nixos-unstable pkgs for this container instead of the host
-                # system's nixpkgs. The overlay is applied so that
-                # pkgs.home-assistant-local-components remains available.
-                nixpkgs.pkgs = import inputs.nixpkgs {
-                  system = pkgs.system;
-                  overlays = [ inputs.self.overlays.default ];
-                };
-
                 imports = [
                   ({ ... }: {
                     services.home-assistant.config = cfg.extraConfig;
@@ -477,6 +474,8 @@ in {
                   configDir = "/var/lib/home-assistant";
                   # Allow UI-based Lovelace dashboard editing
                   lovelaceConfigWritable = true;
+
+                  package = pkgsUnstable.home-assistant;
 
                   # Built-in Home Assistant components to enable
                   # These are the official integrations that ship with Home Assistant
