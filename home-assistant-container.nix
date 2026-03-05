@@ -418,6 +418,14 @@ in {
             nixos = {
               useSystemd = true;
               configuration = {
+                # Use nixos-unstable pkgs for this container instead of the host
+                # system's nixpkgs. The overlay is applied so that
+                # pkgs.home-assistant-local-components remains available.
+                nixpkgs.pkgs = import inputs.nixpkgs-unstable {
+                  system = pkgs.system;
+                  overlays = [ inputs.self.overlays.default ];
+                };
+
                 imports = [
                   ({ ... }: {
                     services.home-assistant.config = cfg.extraConfig;
