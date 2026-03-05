@@ -59,16 +59,12 @@ in {
     # Container image configuration for Docker-based services
     # The home-assistant container is built from nixpkgs (via Arion's nixos mode)
     # and does not use a Docker image — its version tracks pkgs.home-assistant.
-    images = genAttrs [
-      "node-red"
-      "open-wake-word"
-      "whisper"
-      "piper"
-    ] (imgType:
-      mkOption {
-        type = str;
-        description = "${imgType} container image.";
-      });
+    images = genAttrs [ "node-red" "open-wake-word" "whisper" "piper" ]
+      (imgType:
+        mkOption {
+          type = str;
+          description = "${imgType} container image.";
+        });
 
     # Network port configuration
     # These ports are exposed on the host machine for accessing services
@@ -421,7 +417,7 @@ in {
                 # Use nixos-unstable pkgs for this container instead of the host
                 # system's nixpkgs. The overlay is applied so that
                 # pkgs.home-assistant-local-components remains available.
-                nixpkgs.pkgs = import inputs.nixpkgs-unstable {
+                nixpkgs.pkgs = import inputs.nixpkgs {
                   system = pkgs.system;
                   overlays = [ inputs.self.overlays.default ];
                 };
