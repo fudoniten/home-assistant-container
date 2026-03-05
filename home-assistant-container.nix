@@ -712,9 +712,7 @@ in {
             restart = "always";
             volumes = [ "${cfg.state-directory}/whisper:/data" ];
             environment.TZ = timezone;
-            entrypoint = "python3";
             command = concatStringsSep " " [
-              "-m wyoming_faster_whisper"
               "--uri tcp://0.0.0.0:10300"
               "--model ${cfg.whisper.model}" # Configurable model size
               "--beam-size 1" # Faster decoding (less accurate)
