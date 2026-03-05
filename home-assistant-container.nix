@@ -432,8 +432,11 @@ in {
                 system.nssModules = mkForce [ ];
                 systemd = {
                   # Add native library paths for Home Assistant dependencies
-                  services.home-assistant.environment.LD_LIBRARY_PATH =
-                    makeLibraryPath homeAssistantPackages;
+                  services.home-assistant = {
+                    path = homeAssistantPackages;
+                    environment.LD_LIBRARY_PATH =
+                      makeLibraryPath homeAssistantPackages;
+                  };
 
                   # Create required files and symlinks inside the container
                   tmpfiles.settings = {
@@ -476,15 +479,16 @@ in {
                   # patched to fix API mismatch with pymicro-vad >= 2.0.0.
                   # pymicro-vad v2.0.0 renamed Process10ms -> process_10ms, but
                   # HA 2026.2.x still calls the old name.
-                  package = pkgs.pkgsUnstable.home-assistant.overrideAttrs (old: {
-                    postPatch = (old.postPatch or "") + ''
-                      substituteInPlace \
-                        homeassistant/components/assist_pipeline/audio_enhancer.py \
-                        --replace-fail \
-                        "self.vad.Process10ms" \
-                        "self.vad.process_10ms"
-                    '';
-                  });
+                  package = pkgs.pkgsUnstable.home-assistant.overrideAttrs
+                    (old: {
+                      postPatch = (old.postPatch or "") + ''
+                        substituteInPlace \
+                          homeassistant/components/assist_pipeline/audio_enhancer.py \
+                          --replace-fail \
+                          "self.vad.Process10ms" \
+                          "self.vad.process_10ms"
+                      '';
+                    });
                   configDir = "/var/lib/home-assistant";
                   # Allow UI-based Lovelace dashboard editing
                   lovelaceConfigWritable = true;
