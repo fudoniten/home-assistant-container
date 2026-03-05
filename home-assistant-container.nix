@@ -475,20 +475,6 @@ in {
                 # Home Assistant NixOS service configuration
                 services.home-assistant = {
                   enable = true;
-                  # Use Home Assistant from nixpkgs-unstable for latest features,
-                  # patched to fix API mismatch with pymicro-vad >= 2.0.0.
-                  # pymicro-vad v2.0.0 renamed Process10ms -> process_10ms, but
-                  # HA 2026.2.x still calls the old name.
-                  package = pkgs.pkgsUnstable.home-assistant.overrideAttrs
-                    (old: {
-                      postPatch = (old.postPatch or "") + ''
-                        substituteInPlace \
-                          homeassistant/components/assist_pipeline/audio_enhancer.py \
-                          --replace-fail \
-                          "self.vad.Process10ms" \
-                          "self.vad.process_10ms"
-                      '';
-                    });
                   configDir = "/var/lib/home-assistant";
                   # Allow UI-based Lovelace dashboard editing
                   lovelaceConfigWritable = true;
