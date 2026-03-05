@@ -473,18 +473,28 @@ in {
                 services.home-assistant = {
                   enable = true;
                   # Use Home Assistant from nixpkgs-unstable for latest features,
-                  # patched to fix API mismatch with pymicro-vad >= 2.0.0.
-                  # pymicro-vad v2.0.0 renamed Process10ms -> process_10ms, but
-                  # HA 2026.2.x still calls the old name.
-                  package = pkgs.pkgsUnstable.home-assistant.overrideAttrs (old: {
-                    postPatch = (old.postPatch or "") + ''
-                      substituteInPlace \
-                        homeassistant/components/assist_pipeline/audio_enhancer.py \
-                        --replace-fail \
-                        "self.vad.Process10ms" \
-                        "self.vad.process_10ms"
-                    '';
-                  });
+                  # with pymicro-vad pinned to 1.0.2 (the last version whose API
+                  # is compatible with HA 2026.2.x).
+                  #
+                  # nixpkgs bumped pymicro-vad 1.0.2 -> 2.0.1 on 2026-02-01, but
+                  # 2.0.0 renamed MicroVad.Process10ms() -> process_10ms(), breaking
+                  # assist_pipeline/audio_enhancer.py.  nixpkgs reverted the bump on
+                  # 2026-02-28; this override guards against systems whose pkgsUnstable
+                  # is pinned to a commit in that window.
+                  package = pkgs.pkgsUnstable.home-assistant.override {
+                    packageOverrides = _: super: {
+                      "pymicro-vad" = super."pymicro-vad".overridePythonAttrs (_: {
+                        version = "1.0.2";
+                        src = pkgs.fetchFromGitHub {
+                          owner = "rhasspy";
+                          repo = "pymicro-vad";
+                          tag = "1.0.2";
+                          hash =
+                            "sha256-yKy/oD6nl2qZW64+aAHZRAEFextCXT6RpMfPThB8DXE=";
+                        };
+                      });
+                    };
+                  };
                   configDir = "/var/lib/home-assistant";
                   # Allow UI-based Lovelace dashboard editing
                   lovelaceConfigWritable = true;
