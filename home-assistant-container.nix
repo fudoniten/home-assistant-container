@@ -44,7 +44,7 @@ let
   yamlType = (pkgs.formats.yaml { }).type;
 
   # System packages required by Home Assistant for native library support
-  homeAssistantPackages = with pkgs; [ zlib-ng ];
+  homeAssistantPackages = with pkgs; [ zlib-ng ffmpeg ];
 
   inherit (builtins) toJSON;
 
