@@ -20,7 +20,7 @@
   # ============================================================================
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-25.11";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
 
     # Arion - Nix-based Docker Compose manager
