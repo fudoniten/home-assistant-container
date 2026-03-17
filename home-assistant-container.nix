@@ -503,6 +503,8 @@ in {
                     "ipp"
                     "kraken"
                     "marytts"
+                    "mcp"
+                    "mcp_server"
                     "media_player"
                     "media_source"
                     "mobile_app"
