@@ -25,6 +25,10 @@ let
     system = pkgs.system;
     overlays = [
       inputs.self.overlays.default
+      # aiounittest-1.5.0 has a version check that marks it as unsupported for
+      # Python 3.14+, but the package works fine in practice. Override it here
+      # to clear the restriction so nixpkgs unstable (which uses Python 3.14 for
+      # Home Assistant) can include it as a transitive dependency.
       (final: prev: {
         python3 = prev.python3.override {
           packageOverrides = pyFinal: pyPrev: {
