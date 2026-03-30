@@ -23,7 +23,19 @@ let
 
   pkgsUnstable = import inputs.nixpkgsUnstable {
     system = pkgs.system;
-    overlays = [ inputs.self.overlays.default ];
+    overlays = [
+      inputs.self.overlays.default
+      (final: prev: {
+        python3 = prev.python3.override {
+          packageOverrides = pyFinal: pyPrev: {
+            aiounittest = pyPrev.aiounittest.overrideAttrs (_: {
+              disabled = false;
+            });
+          };
+        };
+        python3Packages = final.python3.pkgs;
+      })
+    ];
   };
 
   # Priority constants for systemd tmpfiles
