@@ -23,7 +23,15 @@ let
 
   pkgsUnstable = import inputs.nixpkgsUnstable {
     system = pkgs.system;
-    overlays = [ inputs.self.overlays.default ];
+    overlays = [
+      inputs.self.overlays.default
+      # nixpkgs unstable defaults python3 to 3.14, but some Home Assistant
+      # dependencies (e.g. aiounittest) do not support it yet. Pin to 3.13.
+      (final: prev: {
+        python3 = prev.python313;
+        python3Packages = prev.python313Packages;
+      })
+    ];
   };
 
   # Priority constants for systemd tmpfiles
