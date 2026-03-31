@@ -25,33 +25,11 @@ let
     system = pkgs.system;
     overlays = [
       inputs.self.overlays.default
-      # aiounittest is marked disabled for Python 3.14+ in nixpkgs (see
-      # https://github.com/kwarunek/aiounittest/issues/28), which makes it a
-      # bare `throw` with no `.overrideAttrs`. Rebuild it from source here so
-      # Home Assistant components that pull it in as a transitive dependency
-      # can evaluate.
+      # nixpkgs unstable defaults python3 to 3.14, but some Home Assistant
+      # dependencies (e.g. aiounittest) do not support it yet. Pin to 3.13.
       (final: prev: {
-        python3 = prev.python3.override {
-          packageOverrides = pyFinal: pyPrev: {
-            aiounittest = pyFinal.buildPythonPackage rec {
-              pname = "aiounittest";
-              version = "1.5.0";
-              pyproject = true;
-
-              src = prev.fetchFromGitHub {
-                owner = "kwarunek";
-                repo = "aiounittest";
-                tag = version;
-                hash = "sha256-zX3KpDw7AaEwOLkiHX/ZD+rSMeN7qi9hOVAmVH6Jxgg=";
-              };
-
-              build-system = [ pyFinal.setuptools ];
-              dependencies = [ pyFinal.wrapt ];
-              doCheck = false;
-            };
-          };
-        };
-        python3Packages = final.python3.pkgs;
+        python3 = prev.python313;
+        python3Packages = prev.python313Packages;
       })
     ];
   };
