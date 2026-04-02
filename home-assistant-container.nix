@@ -395,7 +395,17 @@ in {
     # Arion is a Nix wrapper around Docker Compose that enables declarative
     # container definitions with the full power of Nix for building images
     virtualisation.arion.projects.home-assistant.settings = let
-      image = { pkgs, config, ... }: {
+      image = { pkgs, config, ... }:
+        let
+          # Apply the python313 override to the *same* nixpkgs the host is
+          # using. pkgs.extend keeps modules and packages at the same git
+          # revision, avoiding the module/package mismatch that occurs when
+          # nixpkgs.pkgs is set to a separately-imported nixpkgs instance.
+          containerPkgs = pkgs.extend (_final: prev: {
+            python3 = prev.python313;
+            python3Packages = prev.python313Packages;
+          });
+        in {
         project.name = "home-assistant";
         docker-compose.volumes = { node-red-data = { }; };
         services = {
@@ -427,13 +437,7 @@ in {
             nixos = {
               useSystemd = true;
               configuration = {
-                # Pin python3 to 3.13 inside the container. Arion passes pkgs
-                # directly via _module.args, so nixpkgs.overlays is silently
-                # ignored. Setting nixpkgs.pkgs to our pre-built pkgsUnstable
-                # (which has the python313 override) is the only way to
-                # guarantee aiounittest and other 3.14-incompatible deps resolve
-                # correctly.
-                nixpkgs.pkgs = pkgsUnstable;
+                nixpkgs.pkgs = containerPkgs;
                 imports = [
                   ({ ... }: {
                     services.home-assistant.config = cfg.extraConfig;
