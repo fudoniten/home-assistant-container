@@ -397,14 +397,21 @@ in {
     virtualisation.arion.projects.home-assistant.settings = let
       image = { pkgs, config, ... }:
         let
-          # Apply the python313 override to the *same* nixpkgs the host is
-          # using. pkgs.extend keeps modules and packages at the same git
-          # revision, avoiding the module/package mismatch that occurs when
-          # nixpkgs.pkgs is set to a separately-imported nixpkgs instance.
-          containerPkgs = pkgs.extend (_final: prev: {
-            python3 = prev.python313;
-            python3Packages = prev.python313Packages;
-          });
+          # Re-import the host's nixpkgs source (same git revision, so no
+          # module/package mismatch) with a python313 overlay. A fresh import
+          # is required because pkgs.extend and nixpkgs.overlays are both
+          # silently ignored when Arion passes pkgs directly into the NixOS
+          # sub-system — only a distinct pkgs instance is respected by
+          # nixpkgs.pkgs.
+          containerPkgs = import pkgs.path {
+            inherit (pkgs) system config;
+            overlays = [
+              (_final: prev: {
+                python3 = prev.python313;
+                python3Packages = prev.python313Packages;
+              })
+            ];
+          };
         in {
         project.name = "home-assistant";
         docker-compose.volumes = { node-red-data = { }; };
