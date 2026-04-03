@@ -395,24 +395,7 @@ in {
     # Arion is a Nix wrapper around Docker Compose that enables declarative
     # container definitions with the full power of Nix for building images
     virtualisation.arion.projects.home-assistant.settings = let
-      image = { pkgs, config, ... }:
-        let
-          # Re-import the host's nixpkgs source (same git revision, so no
-          # module/package mismatch) with a python313 overlay. A fresh import
-          # is required because pkgs.extend and nixpkgs.overlays are both
-          # silently ignored when Arion passes pkgs directly into the NixOS
-          # sub-system — only a distinct pkgs instance is respected by
-          # nixpkgs.pkgs.
-          containerPkgs = import pkgs.path {
-            inherit (pkgs) system config;
-            overlays = [
-              (_final: prev: {
-                python3 = prev.python313;
-                python3Packages = prev.python313Packages;
-              })
-            ];
-          };
-        in {
+      image = { pkgs, config, ... }: {
         project.name = "home-assistant";
         docker-compose.volumes = { node-red-data = { }; };
         services = {
@@ -444,7 +427,6 @@ in {
             nixos = {
               useSystemd = true;
               configuration = {
-                nixpkgs.pkgs = containerPkgs;
                 imports = [
                   ({ ... }: {
                     services.home-assistant.config = cfg.extraConfig;
@@ -611,14 +593,18 @@ in {
 
                   # Custom components (third-party integrations)
                   customComponents =
-                    # Components from nixpkgs
-                    (with pkgs.home-assistant-custom-components; [
+                    # Use pkgsUnstable here (not the Arion image's pkgs) so
+                    # that custom components are built against the same
+                    # python314 package set as pkgsUnstable.home-assistant.
+                    # The host's nixpkgs (passed to the Arion image function)
+                    # has aiounittest disabled for python3.14 which makes
+                    # pkgs.home-assistant-custom-components fail to evaluate.
+                    (with pkgsUnstable.home-assistant-custom-components; [
                       frigate # NVR with object detection
                       ntfy # Simple push notifications
                       prometheus_sensor # Custom Prometheus metrics
                     ]) ++
-                    # Components built by this flake
-                    (with pkgs.home-assistant-local-components; [
+                    (with pkgsUnstable.home-assistant-local-components; [
                       nodered # Node-Red integration
                       openai_tts # OpenAI text-to-speech
                     ]);
