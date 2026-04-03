@@ -483,7 +483,17 @@ in {
                   # Allow UI-based Lovelace dashboard editing
                   lovelaceConfigWritable = true;
 
-                  package = pkgsUnstable.home-assistant;
+                  package = pkgsUnstable.home-assistant.override {
+                    # aiounittest has disabled = pythonAtLeast "3.14" but
+                    # home-assistant now requires python314. Override within
+                    # the package's Python environment so any transitive
+                    # dependency on aiounittest can evaluate.
+                    packageOverrides = _self: super: {
+                      aiounittest = super.aiounittest.overridePythonAttrs (_: {
+                        disabled = false;
+                      });
+                    };
+                  };
 
                   # Built-in Home Assistant components to enable
                   # These are the official integrations that ship with Home Assistant
