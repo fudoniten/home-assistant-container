@@ -489,14 +489,10 @@ in {
                     # the package's Python environment so any transitive
                     # dependency on aiounittest can evaluate.
                     packageOverrides = _self: super: {
-                      aiounittest = super.aiounittest.overridePythonAttrs (_: {
+                      aiounittest = super.aiounittest.overridePythonAttrs (_old: {
                         disabled = false;
-                        # aiounittest's own tests are broken under python3.14
-                        # (asyncio.get_event_loop() raises RuntimeError).
-                        # aiounittest is a dependency of yalexs (august
-                        # integration); disabling tests allows the build to
-                        # proceed.
                         doCheck = false;
+                        nativeCheckInputs = [ ];
                       });
                     };
                   };
