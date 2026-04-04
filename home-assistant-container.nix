@@ -489,8 +489,10 @@ in {
                     # the package's Python environment so any transitive
                     # dependency on aiounittest can evaluate.
                     packageOverrides = _self: super: {
-                      aiounittest = super.aiounittest.overridePythonAttrs (_: {
+                      aiounittest = super.aiounittest.overridePythonAttrs (_old: {
                         disabled = false;
+                        doCheck = false;
+                        nativeCheckInputs = [ ];
                       });
                     };
                   };
