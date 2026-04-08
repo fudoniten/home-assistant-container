@@ -42,6 +42,13 @@
       url = "github:sfortis/openai_tts";
       flake = false;
     };
+
+    # Custom Home Assistant component: No Longer Evil thermostat
+    # Integrates jailbroken Nest thermostats via the No Longer Evil cloud API
+    nolongerevil = {
+      url = "github:patricktr/NoLongerEvil-HomeAssistant?ref=v1.0.1";
+      flake = false;
+    };
   };
 
   # ============================================================================
@@ -49,7 +56,7 @@
   # ============================================================================
 
   outputs =
-    { self, nixpkgs, utils, arion, hass-node-red, openai_tts, ... }@inputs:
+    { self, nixpkgs, utils, arion, hass-node-red, openai_tts, nolongerevil, ... }@inputs:
 
     # Build packages only for Linux systems
     # Home Assistant containers are Linux-only (primarily x86_64)
@@ -77,13 +84,20 @@
             inherit openai_tts;
             version = "v3.4b5";
           };
+
+          # No Longer Evil thermostat component
+          # Integrates jailbroken Nest thermostats via the No Longer Evil cloud API
+          nolongerevil = pkgs.callPackage ./nolongerevil.nix {
+            inherit nolongerevil;
+            version = "1.0.1";
+          };
         };
 
         # Checks for CI/CD
         # These validate that the packages build correctly
         checks = {
-          # Verify that both custom components build successfully
-          inherit (self.packages.${system}) nodered openai_tts;
+          # Verify that all custom components build successfully
+          inherit (self.packages.${system}) nodered openai_tts nolongerevil;
         };
 
         # Formatter for `nix fmt`
@@ -105,7 +119,7 @@
               # Inject our custom components into a new attribute set
               # This allows the main module to access them via pkgs
               home-assistant-local-components = {
-                inherit (localPackages) nodered openai_tts;
+                inherit (localPackages) nodered openai_tts nolongerevil;
               };
             };
         };

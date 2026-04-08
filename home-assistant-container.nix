@@ -619,6 +619,7 @@ in {
                     (with pkgsUnstable.home-assistant-local-components; [
                       nodered # Node-Red integration
                       openai_tts # OpenAI text-to-speech
+                      nolongerevil # No Longer Evil thermostat (cloud API)
                     ]);
 
                   # Home Assistant configuration.yaml generation
