@@ -92,11 +92,11 @@
     },
     "nixpkgsUnstable": {
       "locked": {
-        "lastModified": 1777578337,
-        "narHash": "sha256-Ad49moKWeXtKBJNy2ebiTQUEgdLyvGmTeykAQ9xM+Z4=",
+        "lastModified": 1778869304,
+        "narHash": "sha256-30sZNZoA1cqF5JNO9fVX+wgiQYjB7HJqqJ4ztCDeBZE=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+        "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
         "type": "github"
       },
       "original": {
@@ -107,11 +107,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1777428379,
-        "narHash": "sha256-ypxFOeDz+CqADEQNL72haqGjvZQdBR5Vc7pyx2JDttI=",
+        "lastModified": 1779102034,
+        "narHash": "sha256-vZJZjLo513IeI8hjzHFc6TDezUd4uCE2Eq4SNO3DNNg=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "755f5aa91337890c432639c60b6064bb7fe67769",
+        "rev": "687f05a9184cad4eaf905c48b63649e3a86f5433",
         "type": "github"
       },
       "original": {
@@ -120,14 +120,31 @@
         "type": "indirect"
       }
     },
+    "nolongerevil": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1774393417,
+        "narHash": "sha256-vKFCuUtoCRIenqh/cM/vaTsI2VmqHw2tWVf7g/gFguM=",
+        "owner": "patricktr",
+        "repo": "NoLongerEvil-HomeAssistant",
+        "rev": "c7fc8025b51c8709ef13b00792f515c42dee9e2b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "patricktr",
+        "ref": "v1.0.1",
+        "repo": "NoLongerEvil-HomeAssistant",
+        "type": "github"
+      }
+    },
     "openai_tts": {
       "flake": false,
       "locked": {
-        "lastModified": 1770796347,
-        "narHash": "sha256-P+jipT1++0VSQ1mERlM2nm74y4XmCgVMmyjGEQo7VxU=",
+        "lastModified": 1777828134,
+        "narHash": "sha256-g0Z2o0asmSjL+t19KXnOR2t65OLHPrXr5xB9/PUQbYU=",
         "owner": "sfortis",
         "repo": "openai_tts",
-        "rev": "5c8b3bebe5f4eb794522ba0268979a9430fc62d5",
+        "rev": "277bc499955db993f9bdf5c07e1ffccfdf05bbf0",
         "type": "github"
       },
       "original": {
@@ -142,6 +159,7 @@
         "hass-node-red": "hass-node-red",
         "nixpkgs": "nixpkgs_2",
         "nixpkgsUnstable": "nixpkgsUnstable",
+        "nolongerevil": "nolongerevil",
         "openai_tts": "openai_tts",
         "utils": "utils"
       }
