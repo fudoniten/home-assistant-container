@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: [nodered, openai_tts]
+        package: [nodered]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,8 +44,8 @@ jobs:
         uses: cachix/cachix-action@v14
         with:
           name: nix-community
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-          skipPush: true  # Only use cache, don't push
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+          skipPush: true # Only use cache, don't push
 
       - name: Build ${{ matrix.package }}
         run: nix build .#${{ matrix.package }} --print-build-logs
