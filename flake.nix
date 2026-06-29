@@ -20,7 +20,7 @@
   # ============================================================================
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-25.11";
+    nixpkgs.url = "nixpkgs/nixos-26.05";
     nixpkgsUnstable.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
 
@@ -32,14 +32,7 @@
     # Version pinned to v4.1.2 for stability
     # flake=false means we just want the source, not to evaluate it as a flake
     hass-node-red = {
-      url = "github:zachowj/hass-node-red?ref=v4.1.2";
-      flake = false;
-    };
-
-    # Custom Home Assistant component: OpenAI TTS
-    # Uses latest commit from main branch
-    openai_tts = {
-      url = "github:sfortis/openai_tts";
+      url = "github:zachowj/hass-node-red?ref=v4.2.3";
       flake = false;
     };
 
@@ -56,7 +49,7 @@
   # ============================================================================
 
   outputs =
-    { self, nixpkgs, utils, arion, hass-node-red, openai_tts, nolongerevil, ... }@inputs:
+    { self, nixpkgs, utils, arion, hass-node-red, nolongerevil, ... }@inputs:
 
     # Build packages only for Linux systems
     # Home Assistant containers are Linux-only (primarily x86_64)
@@ -73,18 +66,6 @@
             version = "4.1.2";
           };
 
-          # OpenAI TTS component
-          # Provides text-to-speech using OpenAI's voice models
-          # FIXME: Version string doesn't match git ref
-          # The input uses latest from main branch, but version is set to v3.4b5
-          # Should either:
-          #   1. Pin input to tag: url = "github:sfortis/openai_tts?ref=v3.4b5"
-          #   2. Use dynamic version: version = "unstable-${openai_tts.shortRev}"
-          openai_tts = pkgs.callPackage ./openai_tts.nix {
-            inherit openai_tts;
-            version = "v3.4b5";
-          };
-
           # No Longer Evil thermostat component
           # Integrates jailbroken Nest thermostats via the No Longer Evil cloud API
           nolongerevil = pkgs.callPackage ./nolongerevil.nix {
@@ -97,7 +78,7 @@
         # These validate that the packages build correctly
         checks = {
           # Verify that all custom components build successfully
-          inherit (self.packages.${system}) nodered openai_tts nolongerevil;
+          inherit (self.packages.${system}) nodered nolongerevil;
         };
 
         # Formatter for `nix fmt`
@@ -119,7 +100,7 @@
               # Inject our custom components into a new attribute set
               # This allows the main module to access them via pkgs
               home-assistant-local-components = {
-                inherit (localPackages) nodered openai_tts nolongerevil;
+                inherit (localPackages) nodered nolongerevil;
               };
             };
         };
