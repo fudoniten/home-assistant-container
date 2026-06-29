@@ -12,7 +12,7 @@
 #
 # Source: https://github.com/patricktr/NoLongerEvil-HomeAssistant
 
-{ nolongerevil, buildHomeAssistantComponent, version, python3Packages, ... }:
+{ nolongerevil, buildHomeAssistantComponent, version, home-assistant, ... }:
 
 buildHomeAssistantComponent {
   src = nolongerevil;
@@ -20,5 +20,11 @@ buildHomeAssistantComponent {
   domain = "nolongerevil";
   version = version;
 
-  propagatedBuildInputs = with python3Packages; [ aiohttp ];
+  # Source aiohttp from Home Assistant's own Python package set rather than the
+  # top-level python3Packages. buildHomeAssistantComponent builds the component
+  # against home-assistant.python3Packages (Python 3.14 in nixos-26.05), while
+  # the top-level python3Packages still defaults to Python 3.13. Pulling aiohttp
+  # from python3Packages produced a Python version mismatch between the
+  # component and its propagated dependency.
+  propagatedBuildInputs = with home-assistant.python3Packages; [ aiohttp ];
 }
