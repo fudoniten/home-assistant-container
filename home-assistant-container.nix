@@ -489,11 +489,12 @@ in {
                     # the package's Python environment so any transitive
                     # dependency on aiounittest can evaluate.
                     packageOverrides = _self: super: {
-                      aiounittest = super.aiounittest.overridePythonAttrs (_old: {
-                        disabled = false;
-                        doCheck = false;
-                        nativeCheckInputs = [ ];
-                      });
+                      aiounittest = super.aiounittest.overridePythonAttrs
+                        (_old: {
+                          disabled = false;
+                          doCheck = false;
+                          nativeCheckInputs = [ ];
+                        });
                     };
                   };
 
@@ -615,10 +616,8 @@ in {
                       frigate # NVR with object detection
                       ntfy # Simple push notifications
                       prometheus_sensor # Custom Prometheus metrics
-                    ]) ++
-                    (with pkgsUnstable.home-assistant-local-components; [
+                    ]) ++ (with pkgsUnstable.home-assistant-local-components; [
                       nodered # Node-Red integration
-                      openai_tts # OpenAI text-to-speech
                       nolongerevil # No Longer Evil thermostat (cloud API)
                     ]);
 
