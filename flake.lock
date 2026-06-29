@@ -60,16 +60,16 @@
     "hass-node-red": {
       "flake": false,
       "locked": {
-        "lastModified": 1734241887,
-        "narHash": "sha256-qRQ4NMKmZUQ9wSYR8i8TPbQc3y69Otp7FSdGuwph14c=",
+        "lastModified": 1772557792,
+        "narHash": "sha256-LOYcyoGwqAe/ufBpYFGJH6wjIKEnMS59LmOeokwsd0w=",
         "owner": "zachowj",
         "repo": "hass-node-red",
-        "rev": "58dfb4167db7c143ce8b54841e568c5fea21273f",
+        "rev": "3cde8beaa71fc0c1206113135f10a82b0ad5ee81",
         "type": "github"
       },
       "original": {
         "owner": "zachowj",
-        "ref": "v4.1.2",
+        "ref": "v4.2.3",
         "repo": "hass-node-red",
         "type": "github"
       }
@@ -106,16 +106,15 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1782498288,
-        "narHash": "sha256-8/X3yyTXiE82b38n32ItbOqfWOVBl+gKa8fILyZfR4Q=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "3cac626ec5e3703e835f227687e88aa9e2f25701",
-        "type": "github"
+        "lastModified": 1782535326,
+        "narHash": "sha256-r4TA57SL7nvj1R+GY/FCLwFU48w9IixTQlzBTIYkt8E=",
+        "rev": "714a5f8c4ead6b31148d829288440ed033ccc041",
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixos/26.05/nixos-26.05.3494.714a5f8c4ead/nixexprs.tar.xz"
       },
       "original": {
         "id": "nixpkgs",
-        "ref": "nixos-25.11",
+        "ref": "nixos-26.05",
         "type": "indirect"
       }
     },
@@ -136,22 +135,6 @@
         "type": "github"
       }
     },
-    "openai_tts": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1777828134,
-        "narHash": "sha256-g0Z2o0asmSjL+t19KXnOR2t65OLHPrXr5xB9/PUQbYU=",
-        "owner": "sfortis",
-        "repo": "openai_tts",
-        "rev": "277bc499955db993f9bdf5c07e1ffccfdf05bbf0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "sfortis",
-        "repo": "openai_tts",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "arion": "arion",
@@ -159,7 +142,6 @@
         "nixpkgs": "nixpkgs_2",
         "nixpkgsUnstable": "nixpkgsUnstable",
         "nolongerevil": "nolongerevil",
-        "openai_tts": "openai_tts",
         "utils": "utils"
       }
     },
