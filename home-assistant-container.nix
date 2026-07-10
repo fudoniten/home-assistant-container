@@ -536,6 +536,7 @@ in {
                     "nest"
                     "nmap_tracker"
                     "ollama"
+                    "open_router"
                     "openai_conversation"
                     "otbr"
                     "pocketcasts"
