@@ -557,6 +557,7 @@ in {
                       };
                     in with pyPkgs; [
                       aiohttp-fast-zlib # Faster compression for web requests
+                      aiohomekit # HomeKit controller integration dependency
                       gtts # Google Text-to-Speech
                       grpcio # gRPC support for Nest/Google integrations
                       pyforked-daapd # DAAP/iTunes library integration
