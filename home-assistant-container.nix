@@ -83,12 +83,11 @@ in {
     # consuming resources and generating journal noise without being on
     # the audio path. Configure your HA `stt:` and `tts:` integrations to
     # point at the cluster FQDNs instead.
-    images = genAttrs [ "node-red" "open-wake-word" ]
-      (imgType:
-        mkOption {
-          type = str;
-          description = "${imgType} container image.";
-        });
+    images = genAttrs [ "node-red" "open-wake-word" ] (imgType:
+      mkOption {
+        type = str;
+        description = "${imgType} container image.";
+      });
 
     # Network port configuration
     # These ports are exposed on the host machine for accessing services
@@ -485,7 +484,6 @@ in {
                     "adguard"
                     "androidtv"
                     "androidtv_remote"
-                    "anthropic"
                     "api"
                     "august"
                     "binary_sensor"
