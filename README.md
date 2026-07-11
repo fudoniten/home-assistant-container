@@ -153,18 +153,12 @@ Home Assistant requires packages from nixpkgs-unstable. Add this to your configu
     ports = {
       home-assistant = 8123;
       node-red = 1880;
-      piper = 10200;
-      whisper = 10300;
-      wake-word = 10400;
     };
 
     # Voice assistant configuration
+    # Wake word: local openwakeword container (this module)
     wake-word = "hey_jarvis";  # Wake word model name
-    whisper = {
-      model = "tiny-int8";     # STT model: tiny-int8, base, small, medium, large
-      language = "en";          # Language: en, es, fr, de, etc.
-    };
-    piper.voice = "en-gb-southern_english_female-low";  # TTS voice
+    # STT/TTS: k8s wyoming namespace — see "Voice Assistant Setup" below.
 
     # Nest thermostat credentials (optional)
     nest = {
@@ -213,24 +207,29 @@ Home Assistant requires packages from nixpkgs-unstable. Add this to your configu
 
 ### Voice Assistant Setup
 
-The voice integration requires three services working together:
+The voice integration has three pieces:
 
-1. **Open-Wake-Word** - Listens for wake word (default: "hey jarvis")
+1. **Open-Wake-Word** (local container, this module) — Listens for wake word (default: "hey jarvis")
    - Available models: hey_jarvis, ok_nabu, alexa, hey_mycroft, hey_rhasspy
    - Configure with: `services.homeAssistantContainer.wake-word`
 
-2. **Whisper** - Converts speech to text
-   - Models: tiny-int8 (fastest), base, small, medium, large (most accurate)
-   - Configure with: `services.homeAssistantContainer.whisper.model`
+2. **Speech-to-Text** (NOT in this module) — Use the k8s `wyoming` namespace
+   - Service: `whisper-http.wyoming.svc.cluster.local:10301` (OpenAI-compat)
+   - Exposed externally as `stt.kube.sea.fudo.link` (or `stt.fudo.ninja` over Tailscale)
+   - Model: `turbo` (preloaded on GPU, 2Ti PVC for model cache)
+   - In HA: add the `openai_whisper` integration with `base_url: https://stt.kube.sea.fudo.link/v1`
 
-3. **Piper** - Converts text back to speech
-   - Many voices available (see [Piper voices](https://rhasspy.github.io/piper-samples/))
-   - Configure with: `services.homeAssistantContainer.piper.voice`
+3. **Text-to-Speech** (NOT in this module) — Use the k8s `wyoming` namespace
+   - Service: `kokoro-tts.wyoming.svc.cluster.local:8880` (OpenAI-compat)
+   - Exposed externally as `tts.kube.sea.fudo.link` (or `tts.fudo.ninja` over Tailscale)
+   - Voices: `af_heart`, `af_bella`, `am_adam`, `bm_george`, and more
+   - In HA: add the `openai` TTS integration with `base_url: https://tts.kube.sea.fudo.link/v1`, `voice: af_heart`
 
-After setup, configure a Wyoming satellite in Home Assistant:
-1. Go to Settings → Devices & Services
-2. Add Integration → Wyoming Protocol
-3. Point to your Whisper (port 10300) and Piper (port 10200) services
+> **Why:** local whisper/piper containers were removed (2026-07-10) because they were
+> not on wormhole0's audio path — HA was using the k8s stack via Tailscale. The local
+> containers consumed resources and generated journal noise without serving requests.
+> This module still ships `home-assistant`, `node-red`, and `open-wake-word` locally;
+> STT/TTS are now exclusively cluster-side.
 
 ## Included Components
 

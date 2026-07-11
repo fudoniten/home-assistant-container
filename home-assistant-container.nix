@@ -3,12 +3,16 @@
 # This module provides a declarative way to run Home Assistant and related services
 # in Docker containers managed by Arion (Nix's Docker Compose wrapper).
 #
-# The module deploys 5 containerized services:
+# The module deploys 3 containerized services:
 # - home-assistant: Main Home Assistant hub
 # - node-red: Visual automation flow editor
 # - open-wake-word: Wake word detection for voice assistants
-# - whisper: Speech-to-text using OpenAI Whisper
-# - piper: Text-to-speech using Piper voices
+#
+# Speech-to-text and text-to-speech are NOT included. The k8s `wyoming` namespace
+# (stt.kube.sea.fudo.link / tts.kube.sea.fudo.link) serves STT/TTS over Tailscale
+# for wormhole0's HA, and the same pattern applies to any host using this module.
+# Configure your HA `stt:` and `tts:` integrations to point at the cluster FQDNs
+# instead of running local Wyoming containers.
 #
 # Home Assistant runs in host network mode to enable device discovery protocols
 # like mDNS, UPnP, and direct network access for IoT devices.
@@ -72,7 +76,14 @@ in {
     # Container image configuration for Docker-based services
     # The home-assistant container is built from nixpkgs (via Arion's nixos mode)
     # and does not use a Docker image — its version tracks pkgs.home-assistant.
-    images = genAttrs [ "node-red" "open-wake-word" "whisper" "piper" ]
+    #
+    # Whisper and Piper were removed (2026-07-10): the k8s `wyoming` namespace
+    # (stt.kube.sea.fudo.link, tts.kube.sea.fudo.link) now serves STT/TTS
+    # over Tailscale for wormhole0's HA, and the local containers were
+    # consuming resources and generating journal noise without being on
+    # the audio path. Configure your HA `stt:` and `tts:` integrations to
+    # point at the cluster FQDNs instead.
+    images = genAttrs [ "node-red" "open-wake-word" ]
       (imgType:
         mkOption {
           type = str;
@@ -263,37 +274,13 @@ in {
       default = "hey_jarvis";
     };
 
-    # Speech-to-text (Whisper) model selection
-    # Trade-off between speed and accuracy:
-    # - tiny-int8: Fastest, lowest resource usage, good for basic commands
-    # - base, small: Balanced performance
-    # - medium, large: Most accurate, requires more CPU/memory
-    whisper.model = mkOption {
-      type = str;
-      description = "Voice-to-text model to use for Whisper.";
-      default = "tiny-int8";
-    };
-
-    # Speech-to-text language
-    # Specifies which language Whisper should recognize
-    # Use ISO 639-1 two-letter language codes (en, es, fr, de, etc.)
-    whisper.language = mkOption {
-      type = str;
-      description =
-        "Language for speech recognition. Use ISO 639-1 codes (en, es, fr, de, etc.).";
-      default = "en";
-      example = "es";
-    };
-
-    # Text-to-speech (Piper) voice selection
-    # Browse available voices at: https://rhasspy.github.io/piper-samples/
-    # Format: <language>-<region>-<name>-<quality>
-    # Quality levels: low (fastest), medium, high (best quality)
-    piper.voice = mkOption {
-      type = str;
-      description = "Voice to use when generating audio from text.";
-      default = "en-gb-southern_english_female-low";
-    };
+    # NOTE: Speech-to-text (whisper.model / whisper.language) and
+    # text-to-speech (piper.voice) options were removed 2026-07-10.
+    # The local whisper/piper containers no longer ship with this module —
+    # STT and TTS are now served by the k8s `wyoming` namespace
+    # (stt.kube.sea.fudo.link / tts.kube.sea.fudo.link). Configure the
+    # model and voice in your HA `stt:` / `tts:` integrations on the
+    # cluster side instead.
 
     # Geographic position configuration
     # Used for:
@@ -360,16 +347,6 @@ in {
         message =
           "services.homeAssistantContainer.images.open-wake-word must be explicitly set (e.g., 'rhasspy/wyoming-openwakeword:latest')";
       }
-      {
-        assertion = cfg.images.whisper != "";
-        message =
-          "services.homeAssistantContainer.images.whisper must be explicitly set (e.g., 'rhasspy/wyoming-whisper:latest')";
-      }
-      {
-        assertion = cfg.images.piper != "";
-        message =
-          "services.homeAssistantContainer.images.piper must be explicitly set (e.g., 'rhasspy/wyoming-piper:latest')";
-      }
     ];
 
     # Create required directories for container state storage
@@ -385,7 +362,7 @@ in {
               mode = "0700";
             };
           };
-          subdirs = [ "config" "node-red" "open-wake-word" "whisper" "piper" ];
+          subdirs = [ "config" "node-red" "open-wake-word" ];
         in genAttrs (map (subdir: "${cfg.state-directory}/${subdir}") subdirs)
         mkRule;
       };
@@ -411,7 +388,7 @@ in {
               volumes =
                 [ "${cfg.state-directory}/config:/var/lib/home-assistant" ];
               ports = [ "${toString cfg.ports.home-assistant}:8123" ];
-              depends_on = [ "node-red" "open-wake-word" "whisper" "piper" ];
+              depends_on = [ "node-red" "open-wake-word" ];
 
               # Host network mode is REQUIRED for Home Assistant to function properly
               # Reasons:
@@ -726,42 +703,12 @@ in {
             ports = [ "10400:10400/tcp" "10400:10400/udp" ];
           };
 
-          # ====================================================================
-          # Whisper Service (Speech-to-Text)
-          # ====================================================================
-          # OpenAI's Whisper for converting spoken commands to text
-          # Uses faster-whisper implementation for better performance
-          # Language is hardcoded to English (TODO: make configurable)
-          whisper.service = {
-            image = cfg.images.whisper;
-            restart = "always";
-            volumes = [ "${cfg.state-directory}/whisper:/data" ];
-            environment.TZ = timezone;
-            command = concatStringsSep " " [
-              "--uri tcp://0.0.0.0:10300"
-              "--model ${cfg.whisper.model}" # Configurable model size
-              "--beam-size 1" # Faster decoding (less accurate)
-              "--language ${cfg.whisper.language}" # Configurable language
-              "--data-dir /data" # Model storage location
-              "--download-dir /data" # Model download location
-            ];
-            ports = [ "10300:10300" ];
-          };
-
-          # ====================================================================
-          # Piper Service (Text-to-Speech)
-          # ====================================================================
-          # Fast, local text-to-speech using neural voices
-          # Much faster than cloud TTS services and works offline
-          piper.service = {
-            image = cfg.images.piper;
-            restart = "always";
-            volumes = [ "${cfg.state-directory}/piper:/data" ];
-            environment.TZ = timezone;
-            # Voice is configured via options (see piper.voice option)
-            command = "--voice ${cfg.piper.voice}";
-            ports = [ "10200:10200" ];
-          };
+          # NOTE: local whisper and piper services were removed 2026-07-10.
+          # STT and TTS are now served by the k8s `wyoming` namespace
+          # (stt.kube.sea.fudo.link / tts.kube.sea.fudo.link). The local
+          # containers were not on the audio path; they consumed resources
+          # and generated journal noise. Configure your HA `stt:` and `tts:`
+          # integrations to point at the cluster FQDNs over Tailscale.
         };
       };
     in { imports = [ image ]; };
