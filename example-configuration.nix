@@ -70,9 +70,6 @@
     ports = {
       home-assistant = 8123; # Web interface
       node-red = 1880; # Node-Red editor
-      piper = 10200; # Text-to-speech service
-      whisper = 10300; # Speech-to-text service
-      wake-word = 10400; # Wake word detection
     };
 
     # ============================================================================
@@ -83,21 +80,13 @@
     # Available: hey_jarvis, ok_nabu, alexa, hey_mycroft, hey_rhasspy
     wake-word = "hey_jarvis";
 
-    # Speech-to-text (Whisper) configuration
-    whisper = {
-      # Model selection
-      # Options: tiny-int8 (fastest), base, small, medium, large (most accurate)
-      # Larger models require more CPU/memory but are more accurate
-      model = "tiny-int8";
-
-      # Language for speech recognition
-      # Use ISO 639-1 two-letter language codes (en, es, fr, de, it, etc.)
-      language = "en"; # Default: "en"
-    };
-
-    # Text-to-speech (Piper) voice
-    # Browse available voices at: https://rhasspy.github.io/piper-samples/
-    piper.voice = "en-gb-southern_english_female-low";
+    # NOTE: Speech-to-text (whisper.model / whisper.language) and
+    # text-to-speech (piper.voice) options were removed 2026-07-10.
+    # The local whisper/piper containers no longer ship with this module.
+    # STT and TTS are now served by the k8s `wyoming` namespace
+    # (stt.kube.sea.fudo.link / tts.kube.sea.fudo.link). Configure the
+    # model and voice in your HA `stt:` / `tts:` integrations on the
+    # cluster side instead.
 
     # ============================================================================
     # Optional: Nest Thermostat Integration
@@ -191,8 +180,6 @@
     # images = {
     #   home-assistant = "ghcr.io/home-assistant/home-assistant:2024.1.0";
     #   node-red = "nodered/node-red:3.1.0";
-    #   piper = "rhasspy/wyoming-piper:latest";
-    #   whisper = "rhasspy/wyoming-whisper:latest";
     #   wake-word = "rhasspy/wyoming-openwakeword:latest";
     # };
   };
