@@ -497,6 +497,7 @@ in {
                     "google_generative_ai_conversation"
                     "history"
                     "ipp"
+                    "jellyfin"
                     "kraken"
                     "marytts"
                     "mcp"
