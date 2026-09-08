@@ -10,7 +10,7 @@
 # - Access to Home Assistant state and services
 #
 # Source: https://github.com/zachowj/hass-node-red
-# Version: 4.1.2 (pinned in flake.nix)
+# Version: 4.2.3 (pinned as the `hass-node-red` input in flake.nix)
 
 { hass-node-red, buildHomeAssistantComponent, version, ... }:
 

@@ -17,26 +17,32 @@
 # Home Assistant runs in host network mode to enable device discovery protocols
 # like mDNS, UPnP, and direct network access for IoT devices.
 
-{ inputs, ... }:
-
 { config, lib, pkgs, ... }:
 
 with lib;
 let
   cfg = config.services.homeAssistantContainer;
 
-  pkgsUnstable = import inputs.nixpkgsUnstable {
-    system = pkgs.system;
-    overlays = [
-      inputs.self.overlays.default
-      # nixpkgs unstable defaults python3 to 3.14, but some Home Assistant
-      # dependencies (e.g. aiounittest) do not support it yet. Pin to 3.13.
-      (final: prev: {
-        python3 = prev.python313;
-        python3Packages = prev.python313Packages;
-      })
-    ];
-  };
+  # Everything Home Assistant comes from the host's package set, which carries
+  # this flake's overlay (`nixpkgs.overlays` is appended to `nixpkgs.pkgs`, so
+  # it applies even when the host supplies its own nixpkgs instance).
+  #
+  # Bound here because `pkgs` is shadowed inside the Arion `image` function
+  # below, and the two must not be mixed: home-assistant, the nixpkgs custom
+  # components, the local components and the Lovelace modules all have to come
+  # from one package set, or they are built against different Python scopes.
+  #
+  # This module used to instantiate its own nixpkgs-unstable carrying a
+  # `python3 = python313` overlay. That overlay is a mass rebuild: `meson` is
+  # `python3.pkgs.buildPythonApplication` and `nodejs` takes `python = python3`,
+  # so nothing downstream of it matched cache.nixos.org and the consuming host
+  # built the lot from source -- including nodejs, whose checkPhase runs the
+  # whole `test-ci-js` suite. It did not even do what it claimed: nixpkgs'
+  # home-assistant takes `python314Packages` directly and never reads the
+  # top-level `python3`, so the aiounittest problem it was aimed at was never
+  # addressed by it. See the note in flake.nix's `overlays` for why no
+  # replacement workaround is needed on 26.05.
+  hostPkgs = pkgs;
 
   # Priority constants for systemd tmpfiles
   # Lower numbers = higher priority (runs first)
@@ -61,7 +67,7 @@ let
   yamlType = (pkgs.formats.yaml { }).type;
 
   # System packages required by Home Assistant for native library support
-  homeAssistantPackages = with pkgsUnstable; [ zlib-ng ffmpeg go2rtc ];
+  homeAssistantPackages = with hostPkgs; [ zlib-ng ffmpeg go2rtc ];
 
   inherit (builtins) toJSON;
 
@@ -459,20 +465,12 @@ in {
                   # Allow UI-based Lovelace dashboard editing
                   lovelaceConfigWritable = true;
 
-                  package = pkgsUnstable.home-assistant.override {
-                    # aiounittest has disabled = pythonAtLeast "3.14" but
-                    # home-assistant now requires python314. Override within
-                    # the package's Python environment so any transitive
-                    # dependency on aiounittest can evaluate.
-                    packageOverrides = _self: super: {
-                      aiounittest = super.aiounittest.overridePythonAttrs
-                        (_old: {
-                          disabled = false;
-                          doCheck = false;
-                          nativeCheckInputs = [ ];
-                        });
-                    };
-                  };
+                  # Plain home-assistant from the host's package set: the same
+                  # derivation cache.nixos.org has, so it substitutes. The
+                  # `packageOverrides` that used to sit here (un-disabling
+                  # aiounittest for python314) is no longer needed on 26.05 --
+                  # see the note in flake.nix's overlays for what was checked.
+                  package = hostPkgs.home-assistant;
 
                   # Built-in Home Assistant components to enable
                   # These are the official integrations that ship with Home Assistant
@@ -532,31 +530,7 @@ in {
                   # Additional Python packages required by components
                   # These are dependencies not automatically detected or not in nixpkgs
                   extraPackages = pyPkgs:
-                    let
-                      # Custom build of hass-web-proxy-lib (not in nixpkgs)
-                      hass-web-proxy = pyPkgs.buildPythonPackage rec {
-                        pname = "hass-web-proxy-lib";
-                        version = "0.0.7";
-                        pyproject = true;
-
-                        src = pyPkgs.fetchPypi {
-                          pname = "hass_web_proxy_lib";
-                          inherit version;
-                          sha256 =
-                            "sha256-bhz71tNOpZ+4tSlndS+UbC3w2WW5+dAMtpk7TnnFpuQ=";
-                        };
-
-                        propagatedBuildInputs = with pyPkgs; [ aiohttp ];
-                        dependencies = with pyPkgs; [ aiohttp homeassistant ];
-                        doCheck = false;
-                        build-system = with pyPkgs; [
-                          poetry-core
-                          setuptools
-                          wheel
-                        ];
-                        pythonImportsCheck = [ "hass_web_proxy_lib" ];
-                      };
-                    in with pyPkgs; [
+                    with pyPkgs; [
                       aiohttp-fast-zlib # Faster compression for web requests
                       aiohomekit # HomeKit controller integration dependency
                       gtts # Google Text-to-Speech
@@ -564,14 +538,18 @@ in {
                       pyforked-daapd # DAAP/iTunes library integration
                       pynws # National Weather Service API
                       pyPkgs."grpcio-status" # gRPC status codes
-                      hass-web-proxy # Web proxy support (custom build)
+                      # Web proxy support. This was a hand-rolled 0.0.7
+                      # buildPythonPackage here, with its own PyPI hash to keep
+                      # current; nixpkgs carries it in home-assistant's own
+                      # Python scope now (defaultOverrides -> 0.0.8).
+                      hass-web-proxy-lib
                       pyatv # Apple TV integration
                     ];
 
                   # Custom Lovelace UI cards from nixpkgs
                   # These enhance the Home Assistant frontend with additional card types
                   customLovelaceModules =
-                    with pkgs.home-assistant-custom-lovelace-modules; [
+                    with hostPkgs.home-assistant-custom-lovelace-modules; [
                       bubble-card # Modern bubble-style cards
                       button-card # Highly customizable buttons
                       card-mod # CSS styling for cards
@@ -584,17 +562,19 @@ in {
 
                   # Custom components (third-party integrations)
                   customComponents =
-                    # Use pkgsUnstable here (not the Arion image's pkgs) so
-                    # that custom components are built against the same
-                    # python314 package set as pkgsUnstable.home-assistant.
-                    # The host's nixpkgs (passed to the Arion image function)
-                    # has aiounittest disabled for python3.14 which makes
-                    # pkgs.home-assistant-custom-components fail to evaluate.
-                    (with pkgsUnstable.home-assistant-custom-components; [
+                    # Both sets come from hostPkgs, the same package set as
+                    # `package` above, so the components and the
+                    # home-assistant running them share one Python scope --
+                    # `home-assistant-custom-components` is scoped off
+                    # `home-assistant.python3Packages`, so taking the two from
+                    # different nixpkgs instances (which is what this module
+                    # used to do) means building components against a Python
+                    # set that is not the one loading them.
+                    (with hostPkgs.home-assistant-custom-components; [
                       frigate # NVR with object detection
                       ntfy # Simple push notifications
                       prometheus_sensor # Custom Prometheus metrics
-                    ]) ++ (with pkgsUnstable.home-assistant-local-components; [
+                    ]) ++ (with hostPkgs.home-assistant-local-components; [
                       nodered # Node-Red integration
                       nolongerevil # No Longer Evil thermostat (cloud API)
                     ]);

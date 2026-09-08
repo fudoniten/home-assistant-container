@@ -20,8 +20,13 @@
   # ============================================================================
 
   inputs = {
+    # Single nixpkgs, tracking the release. There is deliberately no
+    # `nixpkgsUnstable` here: a second nixpkgs instance means a second copy of
+    # everything below it in the closure, and any overlay applied to it (this
+    # flake used to pin `python3` to 3.13 in one) puts every downstream
+    # derivation outside cache.nixos.org, so the consuming host rebuilds it
+    # all from source. Take packages from the same `nixpkgs` the host uses.
     nixpkgs.url = "nixpkgs/nixos-26.05";
-    nixpkgsUnstable.url = "nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
 
     # Arion - Nix-based Docker Compose manager
@@ -29,7 +34,8 @@
     arion.url = "github:hercules-ci/arion";
 
     # Custom Home Assistant component: Node-Red integration
-    # Version pinned to v4.1.2 for stability
+    # Version pinned to v4.2.3 for stability -- keep `version` in the overlay
+    # below in step with this ref; the component's manifest check compares them.
     # flake=false means we just want the source, not to evaluate it as a flake
     hass-node-red = {
       url = "github:zachowj/hass-node-red?ref=v4.2.3";
@@ -48,30 +54,20 @@
   # Outputs
   # ============================================================================
 
-  outputs =
-    { self, nixpkgs, utils, arion, hass-node-red, nolongerevil, ... }@inputs:
+  outputs = { self, nixpkgs, utils, arion, ... }@inputs:
 
     # Build packages only for Linux systems
     # Home Assistant containers are Linux-only (primarily x86_64)
     utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
-      let pkgs = nixpkgs.legacyPackages."${system}";
+      # Build through the overlay rather than beside it, so `packages` and
+      # `pkgs.home-assistant-local-components` are the same derivations and
+      # there is one place that says which version each component is.
+      let pkgs = nixpkgs.legacyPackages."${system}".extend self.overlays.default;
       in {
         # Custom Home Assistant component packages
         # These are built from external GitHub repositories
         packages = {
-          # Node-Red integration component
-          # Allows creating visual automation flows that integrate with Home Assistant
-          nodered = pkgs.callPackage ./hass-node-red.nix {
-            inherit hass-node-red;
-            version = "4.1.2";
-          };
-
-          # No Longer Evil thermostat component
-          # Integrates jailbroken Nest thermostats via the No Longer Evil cloud API
-          nolongerevil = pkgs.callPackage ./nolongerevil.nix {
-            inherit nolongerevil;
-            version = "1.0.1";
-          };
+          inherit (pkgs.home-assistant-local-components) nodered nolongerevil;
         };
 
         # Checks for CI/CD
@@ -94,15 +90,47 @@
         overlays = rec {
           default = homeAssistantComponents;
 
-          homeAssistantComponents = final: prev:
-            let localPackages = self.packages."${prev.system}";
-            in {
-              # Inject our custom components into a new attribute set
-              # This allows the main module to access them via pkgs
-              home-assistant-local-components = {
-                inherit (localPackages) nodered nolongerevil;
+          # No aiounittest workaround here, deliberately. nixpkgs still marks
+          # aiounittest `disabled = pythonAtLeast "3.14"` while home-assistant
+          # requires 3.14, which is what used to make anything reaching it
+          # through home-assistant's Python scope fail to *evaluate* -- the
+          # reason this flake carried its own nixpkgs and an
+          # `home-assistant.override { packageOverrides = ...; }`.
+          #
+          # On nixos-26.05 nothing in that path reaches aiounittest any more.
+          # Checked by evaluating home-assistant with the full extraComponents
+          # and extraPackages list, all three home-assistant-custom-components
+          # and all eight custom-lovelace-modules used by this module: they
+          # evaluate unpatched, and patching aiounittest gives byte-identical
+          # derivation paths. If a future bump reintroduces the failure, patch
+          # `python314Packages` in an overlay here rather than overriding
+          # home-assistant alone -- home-assistant-custom-components is scoped
+          # off `home-assistant.python3Packages`, so a package-level override
+          # fixes home-assistant and leaves the component sets broken.
+
+          # Build the local components from the *consuming* package set
+          # (`final`), not from this flake's own `nixpkgs`. Reading them out of
+          # `self.packages.<system>` ignored final/prev entirely, so a consumer
+          # got components built against whatever nixpkgs this flake happened
+          # to be locked to -- a different Python set from the home-assistant
+          # actually running them, and a second nixpkgs in the closure.
+          homeAssistantComponents = final: _prev: {
+            home-assistant-local-components = {
+              # Node-Red integration component
+              # Allows creating visual automation flows that integrate with Home Assistant
+              nodered = final.callPackage ./hass-node-red.nix {
+                inherit (inputs) hass-node-red;
+                version = "4.2.3";
+              };
+
+              # No Longer Evil thermostat component
+              # Integrates jailbroken Nest thermostats via the No Longer Evil cloud API
+              nolongerevil = final.callPackage ./nolongerevil.nix {
+                inherit (inputs) nolongerevil;
+                version = "1.0.1";
               };
             };
+          };
         };
 
         # ======================================================================
@@ -120,10 +148,7 @@
             # Import required modules:
             # 1. Arion - for container orchestration
             # 2. Our main module - defines services.homeAssistantContainer options
-            imports = [
-              arion.nixosModules.arion
-              (import ./home-assistant-container.nix { inherit inputs; })
-            ];
+            imports = [ arion.nixosModules.arion ./home-assistant-container.nix ];
           };
         };
       };

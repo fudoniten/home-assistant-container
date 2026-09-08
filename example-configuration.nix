@@ -14,15 +14,10 @@
   # Import the Home Assistant Container module
   imports = [ inputs.home-assistant-container.nixosModules.default ];
 
-  # Required: Add nixpkgs-unstable overlay for Home Assistant packages
-  nixpkgs.overlays = [
-    (final: prev: {
-      pkgsUnstable = import inputs.nixpkgs-unstable {
-        system = prev.system;
-        config.allowUnfree = true;
-      };
-    })
-  ];
+  # No extra overlay is needed. The module takes its packages from this host's
+  # own `pkgs`, and nixosModules.default appends the overlay it requires. Point
+  # the flake at your nixpkgs (`inputs.nixpkgs.follows = "nixpkgs"`) so there is
+  # a single instance in the closure.
 
   # ============================================================================
   # Basic Configuration
@@ -277,5 +272,5 @@
   # 6. Updates:
   #    - Run: nix flake update
   #    - Then: sudo nixos-rebuild switch
-  #    - Home Assistant will use the latest images from nixpkgs-unstable
+  #    - Home Assistant tracks whichever nixpkgs this host is built from
 }
