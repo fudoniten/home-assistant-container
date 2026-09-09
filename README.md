@@ -7,17 +7,19 @@ A declarative, reproducible NixOS module for running Home Assistant in container
 This Nix flake provides a complete Home Assistant setup with:
 
 - **Home Assistant Core** - Full smart home automation platform
-- **Voice Integration** - Wake word detection, speech-to-text, and text-to-speech
+- **Voice Integration** - Local wake word detection; STT/TTS served by the k8s
+  `wyoming` namespace rather than by this module (see below)
 - **Visual Automation** - Node-Red for creating automation flows
-- **Extensive Integrations** - 30+ built-in components for smart home devices
-- **Custom Components** - Extended OpenAI Conversation, OpenAI TTS, and Node-Red integration
+- **Extensive Integrations** - 50 built-in components for smart home devices
+- **Custom Components** - Frigate, ntfy, Prometheus sensor, Node-Red and
+  NoLongerEvil (for Nest thermostats too old for Google's SDM API)
 - **Declarative Configuration** - Everything configured as code for reproducibility
 
 All services run in Docker containers managed through [Arion](https://docs.hercules-ci.com/arion/) (Nix's declarative Docker Compose wrapper).
 
 ## Architecture
 
-The flake deploys 5 containerized services:
+The flake deploys 3 containerized services:
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -29,14 +31,12 @@ The flake deploys 5 containerized services:
            ├──► Node-Red (Port 1880)
            │    Visual automation flows
            │
-           ├──► Open-Wake-Word (Port 10400)
-           │    Wake word detection (e.g., "hey jarvis")
-           │
-           ├──► Whisper (Port 10300)
-           │    Speech-to-text using OpenAI Whisper
-           │
-           └──► Piper (Port 10200)
-                Text-to-speech voice synthesis
+           └──► Open-Wake-Word (Port 10400)
+                Wake word detection (e.g., "hey jarvis")
+
+     STT and TTS are NOT containers here. They are served by the
+     k8s `wyoming` namespace over Tailscale -- see "Voice Assistant
+     Setup" below. Local whisper and piper were removed 2026-07-10.
 ```
 
 ### Why Host Network Mode?
@@ -230,23 +230,23 @@ The voice integration has three pieces:
 
 ## Included Components
 
-### Built-in Home Assistant Components (30+)
+### Built-in Home Assistant Components (50)
 
 - **Smart Home**: ESPHome, MQTT, HomeKit Controller, Chromecast, Android TV
 - **Weather**: Met.no, AccuWeather
-- **Voice**: OpenAI Conversation, Extended OpenAI Conversation, MaryTTS
+- **Voice**: OpenAI Conversation, OpenRouter, Ollama, MaryTTS, Wyoming
 - **Media**: Spotify, Pocketcasts, Radio Browser, MPD, Music Assistant
 - **Network**: Nmap Tracker, UPnP, AdGuard Home
-- **Security**: August Locks, Nest
+- **Security**: August Locks
 - **Monitoring**: Prometheus metrics, Energy tracking
 - **Printers**: Brother, IPP
 - **Other**: Synology DSM, Tile tracker, Coinbase, Kraken, Minecraft
 
 ### Custom Components
 
-- **Node-Red** - Visual automation flow editor
-- **Extended OpenAI Conversation** - Enhanced AI conversation with function calling
-- **OpenAI TTS** - Text-to-speech using OpenAI voices
+- **Node-Red** - Visual automation flow editor (built by this flake)
+- **NoLongerEvil** - Nest thermostats running No Longer Evil firmware, for
+  hardware too old for Google's SDM API (built by this flake)
 - **Frigate** - NVR with object detection
 - **Ntfy** - Simple notification service
 - **Prometheus Sensor** - Custom Prometheus metrics
@@ -327,18 +327,23 @@ journalctl -u arion-home-assistant.service -f
 
 ### Voice assistant not working
 
-1. Check all voice services are running:
+1. Check the wake word service is running:
    ```bash
-   docker ps | grep -E "whisper|piper|wake-word"
+   docker ps | grep wake-word
    ```
 
-2. Test Wyoming protocol endpoints:
+2. Test the local Wyoming endpoint:
    ```bash
-   curl http://localhost:10300  # Whisper
-   curl http://localhost:10200  # Piper
+   curl http://localhost:10400  # open-wake-word
    ```
 
-3. Check Home Assistant Wyoming integration configuration
+3. STT and TTS are not local. Check the cluster endpoints instead:
+   ```bash
+   curl https://stt.kube.sea.fudo.link/v1/models
+   curl https://tts.kube.sea.fudo.link/v1/models
+   ```
+
+4. Check Home Assistant Wyoming integration configuration
 
 ### Permission errors
 
@@ -405,11 +410,10 @@ This project follows the license of its components:
 
 - [Home Assistant](https://www.home-assistant.io/) - Open source home automation
 - [Arion](https://docs.hercules-ci.com/arion/) - Nix-based Docker Compose
-- [Whisper](https://github.com/openai/whisper) - OpenAI speech recognition
-- [Piper](https://github.com/rhasspy/piper) - Fast text-to-speech
+- [openWakeWord](https://github.com/dscripka/openWakeWord) - Wake word detection
 - [Node-Red](https://nodered.org/) - Visual flow-based programming
 
 ## Acknowledgments
 
-- Custom components by: jekalmin (Extended OpenAI), sfortis (OpenAI TTS), zachowj (Node-Red)
-- Voice services from the Rhasspy/Wyoming ecosystem
+- Custom components by: zachowj (Node-Red), patricktr (NoLongerEvil)
+- Wake word detection from the Rhasspy/Wyoming ecosystem
