@@ -52,7 +52,7 @@ Home Assistant runs with `network_mode = "host"` to enable:
 ## Prerequisites
 
 - **NixOS** with flakes enabled
-- **nixpkgs unstable overlay** for Home Assistant packages (see Configuration section)
+- **nixpkgs** matching this flake's release (`nixos-26.05`); point the flake's `nixpkgs` input at yours with `inputs.nixpkgs.follows = "nixpkgs"`
 - **Docker/Podman** support (automatically configured through Arion)
 - **Sufficient disk space** for container images and Home Assistant state
 
@@ -85,23 +85,27 @@ Home Assistant runs with `network_mode = "host"` to enable:
 }
 ```
 
-### 3. Add nixpkgs-unstable overlay (Required)
+### 3. Share your nixpkgs (Recommended)
 
-Home Assistant requires packages from nixpkgs-unstable. Add this to your configuration:
+Nothing extra to add: the module takes every Home Assistant package from your
+own `pkgs`, and its `nixosModules.default` already appends the overlay it needs
+(`home-assistant-local-components`, plus an aiounittest fix for the Python 3.14
+interpreter set home-assistant builds from).
+
+Do make this flake follow your nixpkgs, so there is one instance rather than two:
 
 ```nix
-{ inputs, ... }:
-{
-  nixpkgs.overlays = [
-    (final: prev: {
-      pkgsUnstable = import inputs.nixpkgs-unstable {
-        system = prev.system;
-        config.allowUnfree = true;
-      };
-    })
-  ];
-}
+inputs.home-assistant-container = {
+  url = "github:fudoniten/home-assistant-container";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
 ```
+
+Earlier versions asked you to add a `pkgsUnstable` overlay and instantiated a
+second nixpkgs internally, with `python3` pinned to 3.13. That put everything
+downstream of `python3` -- `meson`, and therefore most of the tree -- outside
+cache.nixos.org, so the host rebuilt it from source. Neither is needed now; if
+you still carry that overlay for this module, drop it.
 
 ## Configuration
 
