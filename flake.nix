@@ -117,21 +117,28 @@
           # to be locked to -- a different Python set from the home-assistant
           # actually running them, and a second nixpkgs in the closure.
           homeAssistantComponents = final: _prev: {
-            home-assistant-local-components = {
-              # Node-Red integration component
-              # Allows creating visual automation flows that integrate with Home Assistant
-              nodered = final.callPackage ./hass-node-red.nix {
-                inherit (inputs) hass-node-red;
-                version = "4.2.3";
-              };
+            home-assistant-local-components =
+              # Scoped off home-assistant's own Python set, exactly as nixpkgs
+              # scopes `home-assistant-custom-components`. That is what lets the
+              # component files take their Python dependencies as unqualified
+              # arguments and still get them from the interpreter home-assistant
+              # runs, rather than the top-level one (3.13 against 3.14 on 26.05).
+              let inherit (final.home-assistant.python3Packages) callPackage;
+              in {
+                # Node-Red integration component
+                # Allows creating visual automation flows that integrate with Home Assistant
+                nodered = callPackage ./hass-node-red.nix {
+                  inherit (inputs) hass-node-red;
+                  version = "4.2.3";
+                };
 
-              # No Longer Evil thermostat component
-              # Integrates jailbroken Nest thermostats via the No Longer Evil cloud API
-              nolongerevil = final.callPackage ./nolongerevil.nix {
-                inherit (inputs) nolongerevil;
-                version = "1.0.1";
+                # No Longer Evil thermostat component
+                # Integrates jailbroken Nest thermostats via the No Longer Evil cloud API
+                nolongerevil = callPackage ./nolongerevil.nix {
+                  inherit (inputs) nolongerevil;
+                  version = "1.0.1";
+                };
               };
-            };
           };
         };
 
