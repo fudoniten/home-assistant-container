@@ -112,19 +112,15 @@ in {
       };
     };
 
-    # Google Nest integration credentials
-    # Required if you want to control Nest thermostats and other Nest devices
-    # Credentials are obtained from Google Cloud Console
-    nest = mkOption {
-      type = let
-        nestOpts = {
-          client-id = mkOption { type = str; };
-          client-secret = mkOption { type = str; };
-          project-id = mkOption { type = str; };
-        };
-      in nullOr (submodule nestOpts);
-      default = null;
-    };
+    # NOTE: the `nest` option (Google Nest client-id/client-secret/project-id,
+    # written into configuration.yaml) was removed. The thermostat it existed
+    # for is too old for Google's SDM API, and is driven by the `nolongerevil`
+    # custom component instead -- see `customComponents` below.
+    #
+    # It had never worked in any case: the submodule was built from a bare
+    # attrset of options rather than `{ options = ...; }`, so any value at all
+    # threw "there are no options defined in `nest'". Nothing set it, so
+    # nothing noticed. `prometheus` and `position` show the correct form.
 
     # Additional Home Assistant configuration
     # This YAML-compatible configuration is merged into configuration.yaml
@@ -619,13 +615,6 @@ in {
                       latitude = cfg.position.latitude;
                       longitude = cfg.position.longitude;
                     });
-
-                    # Google Nest integration (if configured)
-                    nest = mkIf (!isNull cfg.nest) {
-                      client_id = cfg.nest.client-id;
-                      client_secret = cfg.nest.client-secret;
-                      project_id = cfg.nest.project-id;
-                    };
 
                     # Prometheus metrics export (if configured)
                     prometheus = mkIf (!isNull cfg.prometheus) {

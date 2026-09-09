@@ -164,13 +164,6 @@ you still carry that overlay for this module, drop it.
     wake-word = "hey_jarvis";  # Wake word model name
     # STT/TTS: k8s wyoming namespace — see "Voice Assistant Setup" below.
 
-    # Nest thermostat credentials (optional)
-    nest = {
-      project-id = "your-project-id";
-      client-id = "your-client-id";
-      client-secret = "your-client-secret";
-    };
-
     # Additional YAML configuration merged into configuration.yaml
     extraConfig = ''
       # Add any additional Home Assistant configuration here
@@ -362,17 +355,15 @@ Store sensitive data in `secrets.yaml`:
 
 ```yaml
 # /var/lib/home-assistant/secrets.yaml
-nest_project_id: "your-secret-project-id"
-nest_client_secret: "your-secret"
+mqtt_password: "your-secret"
 ```
 
 Reference in configuration:
 ```nix
 {
   services.homeAssistantContainer.extraConfig = ''
-    nest:
-      project_id: !secret nest_project_id
-      client_secret: !secret nest_client_secret
+    mqtt:
+      password: !secret mqtt_password
   '';
 
   services.homeAssistantContainer.extraImports = [ "secrets.yaml" ];
