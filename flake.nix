@@ -90,25 +90,43 @@
         # Users can access them via pkgs.home-assistant-local-components
 
         overlays = rec {
-          default = homeAssistantComponents;
+          default = nixpkgs.lib.composeExtensions homeAssistantPython
+            homeAssistantComponents;
 
-          # No aiounittest workaround here, deliberately. nixpkgs still marks
-          # aiounittest `disabled = pythonAtLeast "3.14"` while home-assistant
-          # requires 3.14, which is what used to make anything reaching it
-          # through home-assistant's Python scope fail to *evaluate* -- the
-          # reason this flake carried its own nixpkgs and an
-          # `home-assistant.override { packageOverrides = ...; }`.
+          # nixpkgs marks aiounittest `disabled = pythonAtLeast "3.14"` while
+          # home-assistant requires 3.14, so anything reaching aiounittest
+          # through home-assistant's Python scope throws at *evaluation* time:
           #
-          # On nixos-26.05 nothing in that path reaches aiounittest any more.
-          # Checked by evaluating home-assistant with the full extraComponents
-          # and extraPackages list, all three home-assistant-custom-components
-          # and all eight custom-lovelace-modules used by this module: they
-          # evaluate unpatched, and patching aiounittest gives byte-identical
-          # derivation paths. If a future bump reintroduces the failure, patch
-          # `python314Packages` in an overlay here rather than overriding
-          # home-assistant alone -- home-assistant-custom-components is scoped
-          # off `home-assistant.python3Packages`, so a package-level override
-          # fixes home-assistant and leaves the component sets broken.
+          #     error: aiounittest-1.5.0 not supported for interpreter python3.14
+          #
+          # The path is `extraComponents = [ ... "august" ... ]` -> `yalexs`
+          # (the August library) -> aiounittest in its `nativeCheckInputs`.
+          # It surfaces from `systemd.services.home-assistant.environment`,
+          # because the NixOS module's `environment.PYTHONPATH =
+          # package.pythonPath` forces the whole component environment.
+          # `home-assistant.drvPath` does NOT force it -- extraComponents does
+          # not change the home-assistant derivation itself -- so checking that
+          # alone will tell you there is no problem when there is one.
+          #
+          # Patch it in the interpreter set home-assistant builds from, not on
+          # home-assistant itself: `home-assistant-custom-components` is scoped
+          # off `home-assistant.python3Packages`, so a package-level
+          # `packageOverrides` fixes home-assistant and leaves the component
+          # sets broken.
+          #
+          # The blast radius is just the yalexs chain. Measured on the module's
+          # real component set with `august` dropped: 285 store paths on
+          # PYTHONPATH with and without this overlay, zero differing.
+          homeAssistantPython = _final: prev: {
+            python314Packages = prev.python314Packages.overrideScope
+              (_pyFinal: pyPrev: {
+                aiounittest = pyPrev.aiounittest.overridePythonAttrs (_old: {
+                  disabled = false;
+                  doCheck = false;
+                  nativeCheckInputs = [ ];
+                });
+              });
+          };
 
           # Build the local components from the *consuming* package set
           # (`final`), not from this flake's own `nixpkgs`. Reading them out of

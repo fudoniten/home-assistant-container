@@ -40,8 +40,8 @@ let
   # whole `test-ci-js` suite. It did not even do what it claimed: nixpkgs'
   # home-assistant takes `python314Packages` directly and never reads the
   # top-level `python3`, so the aiounittest problem it was aimed at was never
-  # addressed by it. See the note in flake.nix's `overlays` for why no
-  # replacement workaround is needed on 26.05.
+  # addressed by it. That problem is real and is handled by
+  # `overlays.homeAssistantPython` in flake.nix instead.
   hostPkgs = pkgs;
 
   # Priority constants for systemd tmpfiles
@@ -465,9 +465,10 @@ in {
 
                   # Plain home-assistant from the host's package set: the same
                   # derivation cache.nixos.org has, so it substitutes. The
-                  # `packageOverrides` that used to sit here (un-disabling
-                  # aiounittest for python314) is no longer needed on 26.05 --
-                  # see the note in flake.nix's overlays for what was checked.
+                  # aiounittest fix this used to carry as a `packageOverrides`
+                  # argument now lives in `overlays.homeAssistantPython`
+                  # (flake.nix), where it also reaches the custom component
+                  # sets rather than only this one package.
                   package = hostPkgs.home-assistant;
 
                   # Built-in Home Assistant components to enable
