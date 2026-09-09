@@ -110,6 +110,15 @@ in {
         description = "Port on which to listen for connections to Node Red.";
         default = 1880;
       };
+
+      open-wake-word = mkOption {
+        type = port;
+        description = ''
+          Port on which open-wake-word listens for Wyoming connections, TCP
+          and UDP. Home Assistant's `wyoming` integration is pointed at this.
+        '';
+        default = 10400;
+      };
     };
 
     # NOTE: the `nest` option (Google Nest client-id/client-secret/project-id,
@@ -222,7 +231,7 @@ in {
     trusted-proxies = mkOption {
       type = listOf str;
       description = "List of trusted proxy networks in CIDR notation.";
-      default = [ "127.0.0.0/16" "10.0.0.0/16" "::1" ];
+      default = [ "127.0.0.0/8" "10.0.0.0/16" "::1" ];
       example = [ "127.0.0.1" "192.168.1.100" ];
     };
 
@@ -336,18 +345,11 @@ in {
         message =
           "services.homeAssistantContainer.position.longitude must be between -180 and 180 degrees";
       }
-      # Container image assertions - users must explicitly specify all images
-      # Note: home-assistant is excluded; it is built from pkgs.home-assistant via Arion's nixos mode
-      {
-        assertion = cfg.images.node-red != "";
-        message =
-          "services.homeAssistantContainer.images.node-red must be explicitly set (e.g., 'nodered/node-red:latest')";
-      }
-      {
-        assertion = cfg.images.open-wake-word != "";
-        message =
-          "services.homeAssistantContainer.images.open-wake-word must be explicitly set (e.g., 'rhasspy/wyoming-openwakeword:latest')";
-      }
+      # No assertions on `images`: those options have no default, so an unset
+      # one is already caught by the module system ("option used but not
+      # defined") before any assertion could run. The `!= ""` checks that used
+      # to sit here were unreachable. home-assistant has no image at all -- it
+      # is built from pkgs.home-assistant via Arion's nixos mode.
     ];
 
     # Create required directories for container state storage
@@ -356,7 +358,7 @@ in {
     systemd = {
       tmpfiles.settings = {
         "${toString priorities.tmpfiles.host}-home-assistant" = let
-          mkRule = subdir: {
+          mkRule = _: {
             d = {
               user = "root";
               group = "root";
@@ -503,7 +505,9 @@ in {
                     "mqtt"
                     "minecraft_server"
                     "music_assistant"
-                    "nest"
+                    # No "nest": the SDM API it speaks does not support a
+                    # thermostat this old. The `nolongerevil` custom component
+                    # below drives it instead.
                     "nmap_tracker"
                     "ollama"
                     "open_router"
@@ -530,7 +534,7 @@ in {
                       aiohttp-fast-zlib # Faster compression for web requests
                       aiohomekit # HomeKit controller integration dependency
                       gtts # Google Text-to-Speech
-                      grpcio # gRPC support for Nest/Google integrations
+                      grpcio # gRPC support for the Google integrations
                       pyforked-daapd # DAAP/iTunes library integration
                       pynws # National Weather Service API
                       pyPkgs."grpcio-status" # gRPC status codes
@@ -669,7 +673,8 @@ in {
             # Preload configured wake word model into memory
             command = "--preload-model '${cfg.wake-word}'";
             # Exposes both TCP and UDP for flexibility
-            ports = [ "10400:10400/tcp" "10400:10400/udp" ];
+            ports = let p = toString cfg.ports.open-wake-word;
+            in [ "${p}:10400/tcp" "${p}:10400/udp" ];
           };
 
           # NOTE: local whisper and piper services were removed 2026-07-10.
