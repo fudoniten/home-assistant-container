@@ -2,7 +2,9 @@
 #
 # This builds the No Longer Evil custom component for Home Assistant, which
 # integrates jailbroken Nest thermostats (running No Longer Evil firmware)
-# via the No Longer Evil cloud API.
+# via the No Longer Evil cloud API. It is what this deployment uses in place
+# of the built-in `nest` integration, whose SDM API does not support
+# thermostats this old.
 #
 # Features:
 # - Temperature management and HVAC mode control
@@ -12,19 +14,25 @@
 #
 # Source: https://github.com/patricktr/NoLongerEvil-HomeAssistant
 
-{ nolongerevil, buildHomeAssistantComponent, version, home-assistant, ... }:
+{ lib, nolongerevil, buildHomeAssistantComponent, version, aiohttp, ... }:
 
 buildHomeAssistantComponent {
   src = nolongerevil;
   owner = "patricktr";
   domain = "nolongerevil";
-  version = version;
+  inherit version;
 
-  # Source aiohttp from Home Assistant's own Python package set rather than the
-  # top-level python3Packages. buildHomeAssistantComponent builds the component
-  # against home-assistant.python3Packages (Python 3.14 in nixos-26.05), while
-  # the top-level python3Packages still defaults to Python 3.13. Pulling aiohttp
-  # from python3Packages produced a Python version mismatch between the
-  # component and its propagated dependency.
-  propagatedBuildInputs = with home-assistant.python3Packages; [ aiohttp ];
+  # Unqualified, per nixpkgs' custom-component packaging guidelines: the
+  # overlay calls this file through `home-assistant.python3Packages.callPackage`
+  # (as nixpkgs does for its own custom components), so `aiohttp` already comes
+  # from Home Assistant's Python set rather than the top-level one, which on
+  # 26.05 is still 3.13 against home-assistant's 3.14.
+  dependencies = [ aiohttp ];
+
+  meta = {
+    description =
+      "Home Assistant integration for Nest thermostats running No Longer Evil firmware";
+    homepage = "https://github.com/patricktr/NoLongerEvil-HomeAssistant";
+    license = lib.licenses.mit;
+  };
 }

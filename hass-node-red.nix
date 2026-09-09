@@ -12,11 +12,18 @@
 # Source: https://github.com/zachowj/hass-node-red
 # Version: 4.2.3 (pinned as the `hass-node-red` input in flake.nix)
 
-{ hass-node-red, buildHomeAssistantComponent, version, ... }:
+{ lib, hass-node-red, buildHomeAssistantComponent, version, ... }:
 
 buildHomeAssistantComponent {
   src = hass-node-red;
   owner = "zachowj";
   domain = "nodered";
-  version = version;
+  inherit version;
+
+  meta = {
+    description =
+      "Home Assistant integration for Node-RED, for flow-based automations";
+    homepage = "https://github.com/zachowj/hass-node-red";
+    license = lib.licenses.mit;
+  };
 }

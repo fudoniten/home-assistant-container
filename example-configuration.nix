@@ -84,18 +84,6 @@
     # cluster side instead.
 
     # ============================================================================
-    # Optional: Nest Thermostat Integration
-    # ============================================================================
-
-    # Uncomment and fill in your Nest credentials if you use Nest devices
-    # Get these from: https://console.cloud.google.com/
-    # nest = {
-    #   project-id = "your-nest-project-id";
-    #   client-id = "your-oauth-client-id";
-    #   client-secret = "your-oauth-client-secret";
-    # };
-
-    # ============================================================================
     # Optional: Additional Home Assistant Configuration
     # ============================================================================
 

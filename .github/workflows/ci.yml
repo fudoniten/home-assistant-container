@@ -19,7 +19,10 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v26
         with:
-          nix_path: nixpkgs=channel:nixos-unstable
+          # Only for bare `nix-*` commands; the flake builds from its own
+          # locked nixpkgs (nixos-26.05). Kept in step with it so a stray
+          # `<nixpkgs>` reference cannot pull in a different release.
+          nix_path: nixpkgs=channel:nixos-26.05
 
       - name: Run flake check
         run: nix flake check --system x86_64-linux
@@ -30,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: [nodered]
+        package: [nodered, nolongerevil]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,7 +41,10 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v26
         with:
-          nix_path: nixpkgs=channel:nixos-unstable
+          # Only for bare `nix-*` commands; the flake builds from its own
+          # locked nixpkgs (nixos-26.05). Kept in step with it so a stray
+          # `<nixpkgs>` reference cannot pull in a different release.
+          nix_path: nixpkgs=channel:nixos-26.05
 
       - name: Set up Cachix
         uses: cachix/cachix-action@v14
