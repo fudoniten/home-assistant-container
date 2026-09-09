@@ -35,7 +35,9 @@
 
     # Custom Home Assistant component: Node-Red integration
     # Version pinned to v4.2.3 for stability -- keep `version` in the overlay
-    # below in step with this ref; the component's manifest check compares them.
+    # below in step with this ref by hand. buildHomeAssistantComponent only
+    # checks the manifest's *requirements*, not its version, so a mismatch is
+    # silent: it just mislabels the derivation (this said 4.1.2 for a 4.2.3 src).
     # flake=false means we just want the source, not to evaluate it as a flake
     hass-node-red = {
       url = "github:zachowj/hass-node-red?ref=v4.2.3";
