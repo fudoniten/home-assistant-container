@@ -117,6 +117,15 @@
           # The blast radius is just the yalexs chain. Measured on the module's
           # real component set with `august` dropped: 285 store paths on
           # PYTHONPATH with and without this overlay, zero differing.
+          #
+          # yalexs's own tests are off too. Plain nixpkgs cannot evaluate yalexs
+          # on 3.14 at all, so Hydra never builds it and it is never in the
+          # cache: every nixpkgs bump that touches its inputs rebuilds it on the
+          # deploying host, against an aiounittest upstream disables on 3.14
+          # for being broken there (kwarunek/aiounittest#28). A failing suite
+          # then blocks the whole host's deploy over a library's tests.
+          # `pythonImportsCheck` still runs, so a yalexs that will not import
+          # still fails the build.
           homeAssistantPython = _final: prev: {
             python314Packages = prev.python314Packages.overrideScope
               (_pyFinal: pyPrev: {
@@ -124,6 +133,9 @@
                   disabled = false;
                   doCheck = false;
                   nativeCheckInputs = [ ];
+                });
+                yalexs = pyPrev.yalexs.overridePythonAttrs (_old: {
+                  doCheck = false;
                 });
               });
           };
